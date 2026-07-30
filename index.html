@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Doe - Full Stack Developer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">{'</span>
+                <span class="logo-text">Dev</span>
+                <span class="logo-icon">}</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#skills" class="nav-link">Skills</a></li>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Hi, I'm <span class="gradient-text">John Doe</span></h1>
+            <p class="hero-tagline">
+                I'm a <span id="typing"></span><span class="cursor">|</span>
+            </p>
+            <p class="hero-description">
+                Building beautiful and functional web experiences with modern technologies
+            </p>
+            <div class="hero-buttons">
+                <a href="#projects" class="btn btn-primary">View My Work</a>
+                <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+            </div>
+            <div class="scroll-indicator">
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+                <div class="arrow">↓</div>
+            </div>
+        </div>
+        <div class="hero-background">
+            <div class="gradient-circle circle-1"></div>
+            <div class="gradient-circle circle-2"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>
+                        I'm a passionate full-stack developer with 5+ years of experience creating innovative digital solutions. 
+                        I love transforming complex problems into simple, beautiful interfaces and building robust backend systems.
+                    </p>
+                    <p>
+                        When I'm not coding, you can find me exploring new technologies, contributing to open source, 
+                        or sharing my knowledge with the developer community.
+                    </p>
+                    <div class="about-stats">
+                        <div class="stat">
+                            <h3>50+</h3>
+                            <p>Projects Completed</p>
+                        </div>
+                        <div class="stat">
+                            <h3>30+</h3>
+                            <p>Happy Clients</p>
+                        </div>
+                        <div class="stat">
+                            <h3>5+</h3>
+                            <p>Years Experience</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="profile-placeholder">
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="profileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#0099ff;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <circle cx="100" cy="80" r="50" fill="url(#profileGradient)"/>
+                            <ellipse cx="100" cy="150" rx="60" ry="45" fill="url(#profileGradient)"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="skills">
+        <div class="container">
+            <h2 class="section-title">My Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-item">
+                    <h3>Frontend Development</h3>
+                    <div class="skill-category">
+                        <div class="skill">
+                            <div class="skill-name">HTML/CSS</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 95%"></div>
+                            </div>
+                        </div>
+                        <div class="skill">
+                            <div class="skill-name">JavaScript</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="skill">
+                            <div class="skill-name">React</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <h3>Backend Development</h3>
+                    <div class="skill-category">
+                        <div class="skill">
+                            <div class="skill-name">Node.js</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="skill">
+                            <div class="skill-name">Python</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="skill">
+                            <div class="skill-name">PostgreSQL</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-item">
+                    <h3>Tools & Platforms</h3>
+                    <div class="skill-category">
+                        <div class="skill">
+                            <div class="skill-name">Git/GitHub</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="skill">
+                            <div class="skill-name">Docker</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 78%"></div>
+                            </div>
+                        </div>
+                        <div class="skill">
+                            <div class="skill-name">AWS</div>
+                            <div class="progress-bar">
+                                <div class="progress" style="--progress: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="projects">
+        <div class="container">
+            <h2 class="section-title">Featured Projects</h2>
+            <div class="projects-grid">
+                <!-- Project Card 1 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="image-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>E-Commerce Platform</h3>
+                        <p>A full-stack e-commerce solution with React, Node.js, and MongoDB. Features include product filtering, cart management, and secure payment integration.</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">Node.js</span>
+                            <span class="tag">MongoDB</span>
+                            <span class="tag">Stripe</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="image-placeholder" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Task Management App</h3>
+                        <p>A collaborative task management application with real-time updates. Built with Vue.js and Firebase for seamless team collaboration.</p>
+                        <div class="project-tags">
+                            <span class="tag">Vue.js</span>
+                            <span class="tag">Firebase</span>
+                            <span class="tag">Tailwind</span>
+                            <span class="tag">Real-time</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 3 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="image-placeholder" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>AI Content Generator</h3>
+                        <p>An intelligent content generation tool powered by OpenAI API. Users can generate blog posts, social media content, and more with custom parameters.</p>
+                        <div class="project-tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">OpenAI</span>
+                            <span class="tag">Flask</span>
+                            <span class="tag">React</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 4 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="image-placeholder" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%)"></div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Data Analytics Dashboard</h3>
+                        <p>Interactive analytics dashboard for real-time data visualization. Features interactive charts, custom reports, and data export functionality.</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">D3.js</span>
+                            <span class="tag">PostgreSQL</span>
+                            <span class="tag">Express</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 5 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="image-placeholder" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"></div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Social Media Platform</h3>
+                        <p>A modern social platform with real-time messaging, user profiles, and feed generation using WebSockets for live updates.</p>
+                        <div class="project-tags">
+                            <span class="tag">Next.js</span>
+                            <span class="tag">WebSocket</span>
+                            <span class="tag">PostgreSQL</span>
+                            <span class="tag">Docker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 6 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <div class="image-placeholder" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)"></div>
+                        <div class="project-overlay">
+                            <a href="#" class="project-link">View Project</a>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Weather App</h3>
+                        <p>A beautiful weather application with real-time weather data, location-based forecasts, and weather alerts using OpenWeather API.</p>
+                        <div class="project-tags">
+                            <span class="tag">React</span>
+                            <span class="tag">OpenWeather</span>
+                            <span class="tag">Geolocation</span>
+                            <span class="tag">Charts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="contact-subtitle">Have a project in mind? Let's talk about it!</p>
+            
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-details">
+                            <h3>Email</h3>
+                            <p><a href="mailto:john@example.com">john@example.com</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📱</div>
+                        <div class="contact-details">
+                            <h3>Phone</h3>
+                            <p><a href="tel:+1234567890">+1 (234) 567-890</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <h3>Location</h3>
+                            <p>San Francisco, CA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name *</label>
+                        <input type="text" id="name" name="name" placeholder="Your name" required>
+                        <span class="error-message" id="nameError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        <span class="error-message" id="emailError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" name="subject" placeholder="What is this about?" required>
+                        <span class="error-message" id="subjectError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" placeholder="Your message..." rows="5" required></textarea>
+                        <span class="error-message" id="messageError"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-submit">Send Message</button>
+                    <p class="form-success" id="successMessage"></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 John Doe. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" class="social-icon" title="GitHub">🔗</a>
+                <a href="#" class="social-icon" title="LinkedIn">💼</a>
+                <a href="#" class="social-icon" title="Twitter">🐦</a>
+                <a href="#" class="social-icon" title="Email">✉️</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
