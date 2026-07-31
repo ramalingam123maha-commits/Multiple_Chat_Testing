@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search App - OMDB</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">🎬 MovieFlix</h1>
+                <button class="favorites-toggle" id="favoritesToggle">
+                    ❤️ Favorites (<span id="favoriteCount">0</span>)
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Search for movies, series, episodes..."
+                        autocomplete="off"
+                    >
+                    <button class="search-btn" id="searchBtn">Search</button>
+                </div>
+                <div id="searchError" class="error-message"></div>
+            </section>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="resultsView" data-view="results">
+                    Search Results
+                </button>
+                <button class="toggle-btn" id="favoritesView" data-view="favorites">
+                    My Favorites
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <section id="resultsSection" class="content-section">
+                <div id="loadingSpinner" class="spinner hidden"></div>
+                <div id="moviesGrid" class="movies-grid"></div>
+                <div id="noResults" class="no-results hidden">
+                    <p>No movies found. Try searching for something else!</p>
+                </div>
+            </section>
+
+            <!-- Favorites Section -->
+            <section id="favoritesSection" class="content-section hidden">
+                <div id="favoritesGrid" class="movies-grid"></div>
+                <div id="noFavorites" class="no-results hidden">
+                    <p>No favorites yet. Add some movies to your favorites list!</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Movie Details Modal -->
+    <div id="movieModal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-body">
+                <div id="modalDetails" class="modal-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for modal -->
+    <div id="modalOverlay" class="modal-overlay hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
