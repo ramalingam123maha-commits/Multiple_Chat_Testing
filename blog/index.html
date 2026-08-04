@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inkwell — A Modern Blog</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ░░ READING PROGRESS BAR ░░ -->
+  <div id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+
+  <!-- ░░ STICKY HEADER ░░ -->
+  <header class="header" id="site-header">
+    <div class="header__inner container">
+      <a href="#" class="header__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="var(--accent)"/>
+          <path d="M8 20 L14 8 L20 20" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="10" y1="16.5" x2="18" y2="16.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <span>Inkwell</span>
+      </a>
+
+      <nav class="header__nav" id="main-nav" aria-label="Main navigation">
+        <a href="#" class="nav-link active">Home</a>
+        <a href="#" class="nav-link">Technology</a>
+        <a href="#" class="nav-link">Design</a>
+        <a href="#" class="nav-link">Culture</a>
+        <a href="#" class="nav-link">About</a>
+      </nav>
+
+      <div class="header__actions">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <span class="theme-toggle__icon theme-toggle__sun" aria-hidden="true">
+            <!-- Sun icon -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </span>
+          <span class="theme-toggle__icon theme-toggle__moon" aria-hidden="true">
+            <!-- Moon icon -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </span>
+        </button>
+
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ░░ HERO — FEATURED POST ░░ -->
+    <section class="hero" aria-label="Featured post">
+      <div class="hero__bg">
+        <div class="hero__gradient"></div>
+      </div>
+      <div class="hero__content container">
+        <div class="hero__meta">
+          <span class="badge badge--accent">Featured</span>
+          <span class="hero__category">Technology</span>
+        </div>
+        <h1 class="hero__title">The Future of the Web:<br>AI-Driven Interfaces in 2025</h1>
+        <p class="hero__excerpt">
+          How large language models are reshaping everything from code editors to consumer apps —
+          and what it means for the developers building tomorrow's experiences.
+        </p>
+        <div class="hero__footer">
+          <div class="author">
+            <div class="author__avatar author__avatar--hero">AS</div>
+            <div class="author__info">
+              <span class="author__name">Avery Sinclair</span>
+              <span class="author__date">June 12, 2025 · 8 min read</span>
+            </div>
+          </div>
+          <a href="#" class="btn btn--primary">Read Article →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░ ARTICLE GRID ░░ -->
+    <section class="articles container" aria-label="Latest articles">
+      <div class="articles__header">
+        <h2 class="section-title">Latest Stories</h2>
+        <div class="articles__filters" role="tablist" aria-label="Filter articles by category">
+          <button class="filter-btn active" role="tab" aria-selected="true" data-filter="all">All</button>
+          <button class="filter-btn" role="tab" aria-selected="false" data-filter="technology">Technology</button>
+          <button class="filter-btn" role="tab" aria-selected="false" data-filter="design">Design</button>
+          <button class="filter-btn" role="tab" aria-selected="false" data-filter="culture">Culture</button>
+          <button class="filter-btn" role="tab" aria-selected="false" data-filter="science">Science</button>
+        </div>
+      </div>
+
+      <div class="articles__grid" id="articles-grid">
+
+        <!-- Card 1 -->
+        <article class="card" data-category="design">
+          <a href="#" class="card__img-link" tabindex="-1" aria-hidden="true">
+            <div class="card__img card__img--1">
+              <span class="card__category-badge">Design</span>
+            </div>
+          </a>
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__category">Design</span>
+              <span class="card__read-time">5 min read</span>
+            </div>
+            <h3 class="card__title">
+              <a href="#">Spatial Design: Building for Vision Pro and Beyond</a>
+            </h3>
+            <p class="card__excerpt">Designing for three-dimensional space demands a complete rethink of depth, gesture, and focus — here's how to start.</p>
+            <div class="card__footer">
+              <div class="author author--sm">
+                <div class="author__avatar">MK</div>
+                <span class="author__name">Maya Kim</span>
+              </div>
+              <span class="card__date">Jun 10, 2025</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 2 -->
+        <article class="card card--featured" data-category="technology">
+          <a href="#" class="card__img-link" tabindex="-1" aria-hidden="true">
+            <div class="card__img card__img--2">
+              <span class="card__category-badge">Technology</span>
+            </div>
+          </a>
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__category">Technology</span>
+              <span class="card__read-time">7 min read</span>
+            </div>
+            <h3 class="card__title">
+              <a href="#">Edge Computing Is Eating the Cloud — And That's Good</a>
+            </h3>
+            <p class="card__excerpt">Latency, privacy, and cost pressures are pushing computation closer to users. A deep dive into the shift reshaping infrastructure.</p>
+            <div class="card__footer">
+              <div class="author author--sm">
+                <div class="author__avatar">JS</div>
+                <span class="author__name">Jordan Strauss</span>
+              </div>
+              <span class="card__date">Jun 8, 2025</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 3 -->
+        <article class="card" data-category="culture">
+          <a href="#" class="card__img-link" tabindex="-1" aria-hidden="true">
+            <div class="card__img card__img--3">
+              <span class="card__category-badge">Culture</span>
+            </div>
+          </a>
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__category">Culture</span>
+              <span class="card__read-time">4 min read</span>
+            </div>
+            <h3 class="card__title">
+              <a href="#">Digital Minimalism in the Age of Infinite Scroll</a>
+            </h3>
+            <p class="card__excerpt">Why more developers and creatives are logging off, setting limits, and rediscovering intentional technology use.</p>
+            <div class="card__footer">
+              <div class="author author--sm">
+                <div class="author__avatar">PL</div>
+                <span class="author__name">Priya Larson</span>
+              </div>
+              <span class="card__date">Jun 6, 2025</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 4 -->
+        <article class="card" data-category="science">
+          <a href="#" class="card__img-link" tabindex="-1" aria-hidden="true">
+            <div class="card__img card__img--4">
+              <span class="card__category-badge">Science</span>
+            </div>
+          </a>
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__category">Science</span>
+              <span class="card__read-time">6 min read</span>
+            </div>
+            <h3 class="card__title">
+              <a href="#">Quantum Error Correction: The Milestone We've Been Waiting For</a>
+            </h3>
+            <p class="card__excerpt">Google's latest breakthrough may signal the end of the NISQ era and the dawn of fault-tolerant quantum computers.</p>
+            <div class="card__footer">
+              <div class="author author--sm">
+                <div class="author__avatar">RN</div>
+                <span class="author__name">Ravi Nair</span>
+              </div>
+              <span class="card__date">Jun 4, 2025</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 5 -->
+        <article class="card" data-category="design">
+          <a href="#" class="card__img-link" tabindex="-1" aria-hidden="true">
+            <div class="card__img card__img--5">
+              <span class="card__category-badge">Design</span>
+            </div>
+          </a>
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__category">Design</span>
+              <span class="card__read-time">3 min read</span>
+            </div>
+            <h3 class="card__title">
+              <a href="#">The Typography Renaissance: Variable Fonts Take Center Stage</a>
+            </h3>
+            <p class="card__excerpt">A single font file, infinite expression. How variable fonts are transforming type on the modern web.</p>
+            <div class="card__footer">
+              <div class="author author--sm">
+                <div class="author__avatar">EW</div>
+                <span class="author__name">Elena Wu</span>
+              </div>
+              <span class="card__date">Jun 2, 2025</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Card 6 -->
+        <article class="card" data-category="technology">
+          <a href="#" class="card__img-link" tabindex="-1" aria-hidden="true">
+            <div class="card__img card__img--6">
+              <span class="card__category-badge">Technology</span>
+            </div>
+          </a>
+          <div class="card__body">
+            <div class="card__meta">
+              <span class="card__category">Technology</span>
+              <span class="card__read-time">9 min read</span>
+            </div>
+            <h3 class="card__title">
+              <a href="#">Open Source AI: Who Really Controls the Models Shaping Our World?</a>
+            </h3>
+            <p class="card__excerpt">As open-weight models proliferate, questions about governance, misuse, and accountability grow louder and more urgent.</p>
+            <div class="card__footer">
+              <div class="author author--sm">
+                <div class="author__avatar">TM</div>
+                <span class="author__name">Theo Müller</span>
+              </div>
+              <span class="card__date">May 30, 2025</span>
+            </div>
+          </div>
+        </article>
+
+      </div><!-- /.articles__grid -->
+
+      <div class="articles__load-more">
+        <button class="btn btn--outline" id="load-more-btn">Load More Stories</button>
+      </div>
+    </section>
+
+    <!-- ░░ NEWSLETTER SECTION ░░ -->
+    <section class="newsletter" aria-label="Newsletter signup">
+      <div class="newsletter__inner container">
+        <div class="newsletter__text">
+          <h2 class="newsletter__title">Stay in the loop</h2>
+          <p class="newsletter__sub">Join 24,000+ readers. One curated digest every Tuesday — no spam, ever.</p>
+        </div>
+        <form class="newsletter__form" novalidate aria-label="Email subscription form">
+          <label for="email-input" class="sr-only">Your email address</label>
+          <input type="email" id="email-input" class="newsletter__input" placeholder="your@email.com" required autocomplete="email" />
+          <button type="submit" class="btn btn--primary">Subscribe</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="footer">
+    <div class="footer__inner container">
+      <div class="footer__brand">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="var(--accent)"/>
+          <path d="M8 20 L14 8 L20 20" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="10" y1="16.5" x2="18" y2="16.5" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <span class="footer__brand-name">Inkwell</span>
+        <p class="footer__tagline">Stories worth reading.</p>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h4>Topics</h4>
+          <a href="#">Technology</a>
+          <a href="#">Design</a>
+          <a href="#">Culture</a>
+          <a href="#">Science</a>
+        </div>
+        <div class="footer__col">
+          <h4>Company</h4>
+          <a href="#">About</a>
+          <a href="#">Writers</a>
+          <a href="#">Advertise</a>
+          <a href="#">Careers</a>
+        </div>
+        <div class="footer__col">
+          <h4>Legal</h4>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Cookies</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <p>© 2025 Inkwell. Built with ❤ and great coffee.</p>
+      <div class="footer__socials">
+        <a href="#" aria-label="Twitter">𝕏</a>
+        <a href="#" aria-label="Mastodon">🐘</a>
+        <a href="#" aria-label="RSS Feed">📡</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
