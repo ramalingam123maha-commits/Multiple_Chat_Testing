@@ -1,362 +1,360 @@
-// Configuration
-let API_KEY = localStorage.getItem('weatherApiKey') || '';
-const BASE_URL = 'https://api.openweathermap.org';
-
-// DOM Elements
-const apiKeyModal = document.getElementById('apiKeyModal');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-const suggestionsDiv = document.getElementById('suggestions');
-const weatherCard = document.getElementById('weatherCard');
-const forecastContainer = document.getElementById('forecastContainer');
-const errorMessage = document.getElementById('errorMessage');
-
-// Weather icons mapping
-const weatherIcons = {
-    '01d': '☀️',
-    '01n': '🌙',
-    '02d': '⛅',
-    '02n': '☁️',
-    '03d': '☁️',
-    '03n': '☁️',
-    '04d': '☁️',
-    '04n': '☁️',
-    '09d': '🌧️',
-    '09n': '🌧️',
-    '10d': '🌧️',
-    '10n': '🌧️',
-    '11d': '⛈️',
-    '11n': '⛈️',
-    '13d': '❄️',
-    '13n': '❄️',
-    '50d': '🌫️',
-    '50n': '🌫️'
+const difficultySettings = {
+    easy: {
+        label: 'Easy',
+        operations: ['+', '-'],
+        range: [1, 20]
+    },
+    medium: {
+        label: 'Medium',
+        operations: ['+', '-', '×'],
+        range: [2, 12]
+    },
+    hard: {
+        label: 'Hard',
+        operations: ['+', '-', '×', '÷'],
+        range: [3, 25]
+    }
 };
 
-// Debounce timer for search suggestions
-let debounceTimer;
+const state = {
+    difficulty: 'easy',
+    totalQuestions: 10,
+    timeLimit: 15,
+    currentQuestionIndex: 0,
+    score: 0,
+    currentQuestion: null,
+    questionActive: false,
+    timerId: null,
+    timeRemaining: 15,
+    wrongAnswers: [],
+    progressHistory: JSON.parse(localStorage.getItem('mathPracticeProgress') || '[]')
+};
 
-// Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if API key exists
-    if (!API_KEY) {
-        apiKeyModal.style.display = 'flex';
+const difficultyGrid = document.getElementById('difficultyGrid');
+const difficultyButtons = Array.from(document.querySelectorAll('.difficulty-btn'));
+const questionCountSelect = document.getElementById('questionCount');
+const timeLimitSelect = document.getElementById('timeLimit');
+const difficultyLabel = document.getElementById('difficultyLabel');
+const scoreValue = document.getElementById('scoreValue');
+const questionProgress = document.getElementById('questionProgress');
+const timerValue = document.getElementById('timerValue');
+const timerBar = document.getElementById('timerBar');
+const questionText = document.getElementById('questionText');
+const questionHint = document.getElementById('questionHint');
+const questionCard = document.getElementById('questionCard');
+const answerForm = document.getElementById('answerForm');
+const answerInput = document.getElementById('answerInput');
+const submitBtn = document.getElementById('submitBtn');
+const feedbackMessage = document.getElementById('feedbackMessage');
+const startBtn = document.getElementById('startBtn');
+const nextBtn = document.getElementById('nextBtn');
+const restartBtn = document.getElementById('restartBtn');
+const reviewList = document.getElementById('reviewList');
+const reviewCount = document.getElementById('reviewCount');
+const progressChart = document.getElementById('progressChart');
+const chartSummary = document.getElementById('chartSummary');
+const bestScore = document.getElementById('bestScore');
+const roundsPlayed = document.getElementById('roundsPlayed');
+
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function createQuestion() {
+    const settings = difficultySettings[state.difficulty];
+    const operation = settings.operations[randomInt(0, settings.operations.length - 1)];
+    let left;
+    let right;
+    let prompt;
+    let answer;
+
+    if (operation === '÷') {
+        right = randomInt(2, 12);
+        answer = randomInt(settings.range[0], settings.range[1]);
+        left = right * answer;
+        prompt = `${left} ÷ ${right}`;
+    } else if (operation === '×') {
+        left = randomInt(settings.range[0], settings.range[1]);
+        right = randomInt(settings.range[0], settings.range[1]);
+        answer = left * right;
+        prompt = `${left} × ${right}`;
+    } else if (operation === '-') {
+        left = randomInt(settings.range[0], settings.range[1]);
+        right = randomInt(settings.range[0], settings.range[1]);
+        if (state.difficulty === 'easy' && right > left) {
+            [left, right] = [right, left];
+        }
+        answer = left - right;
+        prompt = `${left} − ${right}`;
     } else {
-        apiKeyModal.style.display = 'none';
-        initializeWeather();
+        left = randomInt(settings.range[0], settings.range[1]);
+        right = randomInt(settings.range[0], settings.range[1]);
+        answer = left + right;
+        prompt = `${left} + ${right}`;
     }
 
-    // API Key Modal Event Listener
-    saveApiKeyBtn.addEventListener('click', () => {
-        const key = apiKeyInput.value.trim();
-        if (key) {
-            API_KEY = key;
-            localStorage.setItem('weatherApiKey', API_KEY);
-            apiKeyModal.style.display = 'none';
-            initializeWeather();
+    return { prompt, answer };
+}
+
+function setFeedback(message, tone = '') {
+    feedbackMessage.textContent = message;
+    feedbackMessage.className = 'feedback-message';
+    if (tone) {
+        feedbackMessage.classList.add(tone);
+    }
+}
+
+function updateDashboard() {
+    difficultyLabel.textContent = difficultySettings[state.difficulty].label;
+    scoreValue.textContent = state.score;
+    questionProgress.textContent = `${Math.min(state.currentQuestionIndex, state.totalQuestions)} / ${state.totalQuestions}`;
+    timerValue.textContent = `${state.timeRemaining}s`;
+    const timerPercent = (state.timeRemaining / state.timeLimit) * 100;
+    timerBar.style.width = `${Math.max(timerPercent, 0)}%`;
+    timerBar.style.background = timerPercent <= 35
+        ? 'linear-gradient(90deg, #f97316, #dc2626)'
+        : 'linear-gradient(90deg, #16a34a, #f97316)';
+    bestScore.textContent = state.progressHistory.reduce((max, item) => Math.max(max, item.score), 0);
+    roundsPlayed.textContent = state.progressHistory.length;
+}
+
+function renderReviewList() {
+    reviewCount.textContent = `${state.wrongAnswers.length} item${state.wrongAnswers.length === 1 ? '' : 's'}`;
+
+    if (state.wrongAnswers.length === 0) {
+        reviewList.className = 'review-list empty-state';
+        reviewList.textContent = 'Mistakes from the current round will appear here for review.';
+        return;
+    }
+
+    reviewList.className = 'review-list';
+    reviewList.innerHTML = state.wrongAnswers.map(item => `
+        <article class="review-item">
+            <strong>${item.prompt}</strong>
+            <p>Your answer: ${item.userAnswer}</p>
+            <p>Correct answer: ${item.correctAnswer}</p>
+        </article>
+    `).join('');
+}
+
+function renderChart() {
+    const ctx = progressChart.getContext('2d');
+    const width = progressChart.width;
+    const height = progressChart.height;
+    ctx.clearRect(0, 0, width, height);
+
+    const history = state.progressHistory.slice(-8);
+    ctx.fillStyle = '#f8fbff';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i += 1) {
+        const y = 30 + ((height - 60) / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(40, y);
+        ctx.lineTo(width - 20, y);
+        ctx.stroke();
+    }
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '12px Segoe UI';
+    const maxScore = Math.max(...history.map(item => item.score), state.totalQuestions, 5);
+
+    for (let i = 0; i < 5; i += 1) {
+        const value = Math.round(maxScore - (maxScore / 4) * i);
+        const y = 34 + ((height - 60) / 4) * i;
+        ctx.fillText(String(value), 10, y);
+    }
+
+    if (history.length === 0) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '16px Segoe UI';
+        ctx.fillText('No rounds completed yet.', width / 2 - 84, height / 2);
+        chartSummary.textContent = 'Play a round to generate your first progress point.';
+        return;
+    }
+
+    const pointGap = history.length === 1 ? 0 : (width - 90) / (history.length - 1);
+    const points = history.map((item, index) => {
+        const x = 50 + pointGap * index;
+        const y = height - 30 - (item.score / maxScore) * (height - 70);
+        return { x, y, ...item };
+    });
+
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    points.forEach((point, index) => {
+        if (index === 0) {
+            ctx.moveTo(point.x, point.y);
         } else {
-            showError('Please enter a valid API key');
+            ctx.lineTo(point.x, point.y);
         }
     });
+    ctx.stroke();
 
-    // Allow Enter key to save API key
-    apiKeyInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            saveApiKeyBtn.click();
+    points.forEach((point, index) => {
+        ctx.fillStyle = '#2563eb';
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#475569';
+        ctx.fillText(`R${state.progressHistory.length - history.length + index + 1}`, point.x - 10, height - 10);
+    });
+
+    const latest = history[history.length - 1];
+    chartSummary.textContent = `Latest round: ${latest.score}/${latest.total} correct on ${latest.difficulty}. Average score: ${Math.round(history.reduce((sum, item) => sum + item.score, 0) / history.length)}.`;
+}
+
+function stopTimer() {
+    window.clearInterval(state.timerId);
+    state.timerId = null;
+}
+
+function lockQuestion() {
+    state.questionActive = false;
+    answerInput.disabled = true;
+    submitBtn.disabled = true;
+}
+
+function startTimer() {
+    stopTimer();
+    state.timeRemaining = state.timeLimit;
+    updateDashboard();
+
+    state.timerId = window.setInterval(() => {
+        state.timeRemaining -= 1;
+        updateDashboard();
+
+        if (state.timeRemaining <= 0) {
+            stopTimer();
+            handleAnswer(null, true);
         }
-    });
+    }, 1000);
+}
 
-    // Event listeners for search
-    searchBtn.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', event => {
-        if (event.key === 'Enter') handleSearch();
+function showQuestion() {
+    state.currentQuestion = createQuestion();
+    state.currentQuestionIndex += 1;
+    state.questionActive = true;
+    questionCard.classList.remove('waiting');
+    questionText.textContent = state.currentQuestion.prompt;
+    questionHint.textContent = 'Solve the problem before time runs out.';
+    answerInput.value = '';
+    answerInput.disabled = false;
+    submitBtn.disabled = false;
+    answerInput.focus();
+    nextBtn.classList.add('hidden');
+    restartBtn.classList.add('hidden');
+    setFeedback('Think carefully and submit your answer.');
+    updateDashboard();
+    startTimer();
+}
+
+function beginRound() {
+    stopTimer();
+    state.totalQuestions = Number(questionCountSelect.value);
+    state.timeLimit = Number(timeLimitSelect.value);
+    state.currentQuestionIndex = 0;
+    state.score = 0;
+    state.wrongAnswers = [];
+    renderReviewList();
+    startBtn.classList.add('hidden');
+    restartBtn.classList.add('hidden');
+    showQuestion();
+}
+
+function finishRound() {
+    lockQuestion();
+    stopTimer();
+    questionText.textContent = 'Round complete!';
+    questionHint.textContent = `Final score: ${state.score} out of ${state.totalQuestions}. Review any mistakes below.`;
+    setFeedback(state.score === state.totalQuestions ? 'Perfect round. Outstanding work!' : 'Round finished. Review missed questions and try again.', state.score === state.totalQuestions ? 'correct' : '');
+    restartBtn.classList.remove('hidden');
+    nextBtn.classList.add('hidden');
+
+    state.progressHistory.push({
+        score: state.score,
+        total: state.totalQuestions,
+        difficulty: difficultySettings[state.difficulty].label
     });
-    searchInput.addEventListener('input', handleSearchInput);
+    state.progressHistory = state.progressHistory.slice(-20);
+    localStorage.setItem('mathPracticeProgress', JSON.stringify(state.progressHistory));
+    updateDashboard();
+    renderChart();
+}
+
+function handleAnswer(value, timedOut = false) {
+    if (!state.questionActive) {
+        return;
+    }
+
+    lockQuestion();
+    stopTimer();
+
+    const userAnswer = timedOut ? 'No answer' : Number(value);
+    const isCorrect = !timedOut && userAnswer === state.currentQuestion.answer;
+
+    if (isCorrect) {
+        state.score += 1;
+        setFeedback('Correct! Great job.', 'correct');
+        questionHint.textContent = 'Nice work — keep the streak going.';
+    } else {
+        state.wrongAnswers.push({
+            prompt: state.currentQuestion.prompt,
+            userAnswer,
+            correctAnswer: state.currentQuestion.answer
+        });
+        renderReviewList();
+        setFeedback(timedOut ? `Time is up. The correct answer was ${state.currentQuestion.answer}.` : `Not quite. The correct answer was ${state.currentQuestion.answer}.`, 'incorrect');
+        questionHint.textContent = timedOut ? 'Try solving the next one a bit faster.' : 'Review the correct answer and keep practicing.';
+    }
+
+    updateDashboard();
+
+    if (state.currentQuestionIndex >= state.totalQuestions) {
+        finishRound();
+    } else {
+        nextBtn.classList.remove('hidden');
+    }
+}
+
+difficultyGrid.addEventListener('click', event => {
+    const button = event.target.closest('.difficulty-btn');
+    if (!button) {
+        return;
+    }
+
+    state.difficulty = button.dataset.difficulty;
+    difficultyButtons.forEach(item => item.classList.toggle('active', item === button));
+    updateDashboard();
 });
 
-// Initialize weather display
-function initializeWeather() {
-    // Get weather for default city or current location
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
-                fetchWeatherByCoordinates(latitude, longitude);
-            },
-            error => {
-                console.log('Geolocation error:', error);
-                fetchWeatherByCity('London');
-            }
-        );
-    } else {
-        fetchWeatherByCity('London');
-    }
-}
-
-// Handle search input - show suggestions
-async function handleSearchInput(event) {
-    const query = event.target.value.trim();
-
-    clearTimeout(debounceTimer);
-    suggestionsDiv.innerHTML = '';
-
-    if (query.length < 2) return;
-
-    debounceTimer = setTimeout(async () => {
-        if (!API_KEY) {
-            showError('Please enter a valid API key');
-            return;
-        }
-
-        try {
-            const response = await fetch(
-                `${BASE_URL}/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
-            );
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    showError('Invalid API key. Please check your key and reload.');
-                    localStorage.removeItem('weatherApiKey');
-                }
-                return;
-            }
-
-            const cities = await response.json();
-
-            if (cities.length === 0) {
-                suggestionsDiv.innerHTML = '<div class="suggestion-item">No cities found</div>';
-                return;
-            }
-
-            cities.forEach(city => {
-                const suggestion = document.createElement('div');
-                suggestion.className = 'suggestion-item';
-                suggestion.innerHTML = `${city.name}${city.state ? ', ' + city.state : ''}, ${city.country}`;
-                suggestion.addEventListener('click', () => {
-                    searchInput.value = city.name;
-                    suggestionsDiv.innerHTML = '';
-                    fetchWeatherByCoordinates(city.lat, city.lon, city.name);
-                });
-                suggestionsDiv.appendChild(suggestion);
-            });
-        } catch (error) {
-            console.error('Error fetching suggestions:', error);
-            showError('Error fetching city suggestions');
-        }
-    }, 300);
-}
-
-// Handle search button click
-function handleSearch() {
-    const query = searchInput.value.trim();
-    if (query) {
-        suggestionsDiv.innerHTML = '';
-        fetchWeatherByCity(query);
-    }
-}
-
-// Fetch weather by city name
-async function fetchWeatherByCity(cityName) {
-    if (!API_KEY) {
-        showError('Please enter a valid API key');
+answerForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!state.questionActive || answerInput.value === '') {
         return;
     }
+    handleAnswer(answerInput.value);
+});
 
-    try {
-        showError('');
-        weatherCard.innerHTML = '<div class="loading">Loading weather data...</div>';
-        
-        // Get coordinates from city name
-        const geoResponse = await fetch(
-            `${BASE_URL}/geo/1.0/direct?q=${encodeURIComponent(cityName)}&limit=1&appid=${API_KEY}`
-        );
+startBtn.addEventListener('click', beginRound);
+nextBtn.addEventListener('click', showQuestion);
+restartBtn.addEventListener('click', beginRound);
+questionCountSelect.addEventListener('change', () => {
+    state.totalQuestions = Number(questionCountSelect.value);
+    updateDashboard();
+    renderChart();
+});
+timeLimitSelect.addEventListener('change', () => {
+    state.timeLimit = Number(timeLimitSelect.value);
+    state.timeRemaining = state.timeLimit;
+    updateDashboard();
+});
 
-        if (!geoResponse.ok) {
-            if (geoResponse.status === 401) {
-                showError('Invalid API key. Please reload and enter a valid key.');
-                localStorage.removeItem('weatherApiKey');
-            }
-            throw new Error('City not found');
-        }
-
-        const cities = await geoResponse.json();
-        if (cities.length === 0) {
-            showError('City not found. Please try again.');
-            weatherCard.innerHTML = '';
-            return;
-        }
-
-        const { lat, lon, name, state, country } = cities[0];
-        await fetchWeatherByCoordinates(lat, lon, name);
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Error fetching weather data. Please check the city name.');
-        weatherCard.innerHTML = '';
-    }
-}
-
-// Fetch weather by coordinates
-async function fetchWeatherByCoordinates(lat, lon, cityName = '') {
-    if (!API_KEY) {
-        showError('Please enter a valid API key');
-        return;
-    }
-
-    try {
-        showError('');
-        weatherCard.innerHTML = '<div class="loading">Loading weather data...</div>';
-
-        const response = await fetch(
-            `${BASE_URL}/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-        );
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                showError('Invalid API key. Please reload and enter a valid key.');
-                localStorage.removeItem('weatherApiKey');
-            }
-            throw new Error('Failed to fetch weather');
-        }
-
-        const data = await response.json();
-        displayCurrentWeather(data, cityName);
-        displayForecast(data);
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Error fetching weather data. Please try again.');
-        weatherCard.innerHTML = '';
-    }
-}
-
-// Display current weather
-function displayCurrentWeather(data, cityName) {
-    const current = data.list[0];
-    const { main, weather, wind, clouds, visibility } = current;
-    const city = data.city.name;
-    const { lat, lon } = data.city.coord;
-
-    const weatherIcon = weatherIcons[weather[0].icon] || '🌡️';
-    const feelsLike = Math.round(main.feels_like);
-    const temp = Math.round(main.temp);
-    const description = weather[0].main;
-
-    weatherCard.innerHTML = `
-        <div class="weather-header">
-            <h2>${cityName || city}</h2>
-            <p class="coordinates">Lat: ${lat.toFixed(2)}° | Lon: ${lon.toFixed(2)}°</p>
-        </div>
-        
-        <div class="weather-main">
-            <div class="weather-icon">${weatherIcon}</div>
-            <div class="weather-temp">
-                <div class="temperature">${temp}°C</div>
-                <div class="description">${description}</div>
-            </div>
-        </div>
-
-        <div class="weather-details">
-            <div class="detail-item">
-                <span class="detail-label">Feels Like</span>
-                <span class="detail-value">${feelsLike}°C</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Humidity</span>
-                <span class="detail-value">${main.humidity}%</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Wind Speed</span>
-                <span class="detail-value">${wind.speed.toFixed(1)} km/h</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Pressure</span>
-                <span class="detail-value">${main.pressure} hPa</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Visibility</span>
-                <span class="detail-value">${(visibility / 1000).toFixed(1)} km</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Cloud Cover</span>
-                <span class="detail-value">${clouds.all}%</span>
-            </div>
-        </div>
-    `;
-}
-
-// Display 5-day forecast
-function displayForecast(data) {
-    const forecastData = {};
-
-    // Group forecast data by day
-    data.list.forEach(item => {
-        const date = new Date(item.dt * 1000);
-        const dayKey = date.toLocaleDateString();
-
-        if (!forecastData[dayKey]) {
-            forecastData[dayKey] = {
-                temps: [],
-                humidity: [],
-                wind: [],
-                weather: null,
-                icon: null
-            };
-        }
-
-        forecastData[dayKey].temps.push(item.main.temp);
-        forecastData[dayKey].humidity.push(item.main.humidity);
-        forecastData[dayKey].wind.push(item.wind.speed);
-        
-        if (!forecastData[dayKey].weather) {
-            forecastData[dayKey].weather = item.weather[0].main;
-            forecastData[dayKey].icon = item.weather[0].icon;
-        }
-    });
-
-    // Display first 5 days
-    forecastContainer.innerHTML = '';
-    const days = Object.keys(forecastData).slice(0, 5);
-
-    days.forEach((dayKey, index) => {
-        if (index === 0) return; // Skip today
-
-        const day = forecastData[dayKey];
-        const avgTemp = Math.round(day.temps.reduce((a, b) => a + b) / day.temps.length);
-        const minTemp = Math.round(Math.min(...day.temps));
-        const maxTemp = Math.round(Math.max(...day.temps));
-        const avgHumidity = Math.round(day.humidity.reduce((a, b) => a + b) / day.humidity.length);
-        const avgWind = (day.wind.reduce((a, b) => a + b) / day.wind.length).toFixed(1);
-        const icon = weatherIcons[day.icon] || '🌡️';
-
-        const date = new Date(dayKey);
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-        const forecastCard = document.createElement('div');
-        forecastCard.className = 'forecast-card';
-        forecastCard.innerHTML = `
-            <div class="forecast-date">
-                <div class="day-name">${dayName}</div>
-                <div class="date-str">${dateStr}</div>
-            </div>
-            <div class="forecast-icon">${icon}</div>
-            <div class="forecast-desc">${day.weather}</div>
-            <div class="forecast-temps">
-                <span class="temp-max">${maxTemp}°</span>
-                <span class="temp-min">${minTemp}°</span>
-            </div>
-            <div class="forecast-details">
-                <div><small>💧 ${avgHumidity}%</small></div>
-                <div><small>💨 ${avgWind} km/h</small></div>
-            </div>
-        `;
-        forecastContainer.appendChild(forecastCard);
-    });
-}
-
-// Show error message
-function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.style.display = message ? 'block' : 'none';
-}
+updateDashboard();
+renderReviewList();
+renderChart();
+setFeedback('Your feedback will appear here.');

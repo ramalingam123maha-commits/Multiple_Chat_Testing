@@ -3,67 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
+    <title>Math Practice Challenge</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <!-- API Key Modal -->
-        <div id="apiKeyModal" class="modal">
-            <div class="modal-content">
-                <h2>Welcome to Weather Dashboard!</h2>
-                <p>To get started, you need an OpenWeatherMap API key.</p>
-                <ol>
-                    <li>Visit <a href="https://openweathermap.org/api" target="_blank">https://openweathermap.org/api</a></li>
-                    <li>Sign up for a free account</li>
-                    <li>Go to your API keys section</li>
-                    <li>Copy your API key below</li>
-                </ol>
-                <input 
-                    type="text" 
-                    id="apiKeyInput" 
-                    class="api-key-input" 
-                    placeholder="Paste your OpenWeatherMap API key here..."
-                    autocomplete="off"
-                >
-                <button id="saveApiKeyBtn" class="api-key-btn">Save API Key</button>
-                <p class="info-text">Your API key is stored locally and never shared with anyone.</p>
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Student Math Practice</p>
+                <h1>Build arithmetic skills one question at a time.</h1>
+                <p class="subtitle">Choose a difficulty, race the timer, review mistakes, and watch your progress improve across each round.</p>
             </div>
-        </div>
-
-        <!-- Header with Search -->
-        <header class="header">
-            <h1 class="title">🌤️ Weather Dashboard</h1>
-            <div class="search-bar">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    class="search-input" 
-                    placeholder="Search for a city..."
-                    autocomplete="off"
-                >
-                <button id="searchBtn" class="search-btn">Search</button>
-                <div id="suggestions" class="suggestions"></div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="label">Best Score</span>
+                    <strong id="bestScore">0</strong>
+                </div>
+                <div class="hero-stat">
+                    <span class="label">Rounds Played</span>
+                    <strong id="roundsPlayed">0</strong>
+                </div>
             </div>
         </header>
 
-        <!-- Current Weather Section -->
-        <section class="current-weather">
-            <div id="weatherCard" class="weather-card">
-                <div class="loading">Loading weather data...</div>
-            </div>
-        </section>
+        <main class="layout">
+            <section class="panel control-panel">
+                <h2>Practice Setup</h2>
+                <div class="difficulty-grid" id="difficultyGrid">
+                    <button class="difficulty-btn active" data-difficulty="easy">
+                        <span>Easy</span>
+                        <small>Addition & subtraction up to 20</small>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="medium">
+                        <span>Medium</span>
+                        <small>Mixed operations up to 12 × 12</small>
+                    </button>
+                    <button class="difficulty-btn" data-difficulty="hard">
+                        <span>Hard</span>
+                        <small>Larger values with division included</small>
+                    </button>
+                </div>
 
-        <!-- 5-Day Forecast Section -->
-        <section class="forecast-section">
-            <h2>5-Day Forecast</h2>
-            <div id="forecastContainer" class="forecast-container">
-                <div class="loading">Loading forecast...</div>
-            </div>
-        </section>
+                <div class="settings-grid">
+                    <label class="setting-card">
+                        <span>Questions per round</span>
+                        <select id="questionCount">
+                            <option value="5">5 Questions</option>
+                            <option value="10" selected>10 Questions</option>
+                            <option value="15">15 Questions</option>
+                        </select>
+                    </label>
+                    <label class="setting-card">
+                        <span>Seconds per question</span>
+                        <select id="timeLimit">
+                            <option value="10">10 Seconds</option>
+                            <option value="15" selected>15 Seconds</option>
+                            <option value="20">20 Seconds</option>
+                        </select>
+                    </label>
+                </div>
 
-        <!-- Error Message -->
-        <div id="errorMessage" class="error-message"></div>
+                <button id="startBtn" class="primary-btn">Start Practice</button>
+                <button id="nextBtn" class="secondary-btn hidden">Next Question</button>
+                <button id="restartBtn" class="secondary-btn hidden">Play Another Round</button>
+            </section>
+
+            <section class="panel game-panel">
+                <div class="status-row">
+                    <div>
+                        <span class="status-label">Difficulty</span>
+                        <strong id="difficultyLabel">Easy</strong>
+                    </div>
+                    <div>
+                        <span class="status-label">Score</span>
+                        <strong id="scoreValue">0</strong>
+                    </div>
+                    <div>
+                        <span class="status-label">Question</span>
+                        <strong id="questionProgress">0 / 10</strong>
+                    </div>
+                </div>
+
+                <div class="timer-card">
+                    <div class="timer-header">
+                        <span>Time Remaining</span>
+                        <strong id="timerValue">15s</strong>
+                    </div>
+                    <div class="timer-track">
+                        <div id="timerBar" class="timer-bar"></div>
+                    </div>
+                </div>
+
+                <div id="questionCard" class="question-card waiting">
+                    <p class="question-helper">Press start to begin your practice round.</p>
+                    <h2 id="questionText">Ready?</h2>
+                    <p id="questionHint" class="question-hint">Select a level and challenge yourself.</p>
+                </div>
+
+                <form id="answerForm" class="answer-form">
+                    <label for="answerInput" class="sr-only">Enter your answer</label>
+                    <input id="answerInput" type="number" inputmode="numeric" autocomplete="off" placeholder="Type your answer" disabled>
+                    <button type="submit" id="submitBtn" class="primary-btn" disabled>Submit</button>
+                </form>
+
+                <p id="feedbackMessage" class="feedback-message">Your feedback will appear here.</p>
+            </section>
+
+            <section class="insights-column">
+                <section class="panel review-panel">
+                    <div class="section-heading">
+                        <h2>Wrong Answer Review</h2>
+                        <span id="reviewCount" class="pill">0 items</span>
+                    </div>
+                    <div id="reviewList" class="review-list empty-state">
+                        Mistakes from the current round will appear here for review.
+                    </div>
+                </section>
+
+                <section class="panel chart-panel">
+                    <div class="section-heading">
+                        <h2>Progress Chart</h2>
+                        <span class="pill">Last 8 rounds</span>
+                    </div>
+                    <div class="chart-wrap">
+                        <canvas id="progressChart" width="640" height="220" aria-label="Score progress chart"></canvas>
+                    </div>
+                    <div id="chartSummary" class="chart-summary">Play a round to generate your first progress point.</div>
+                </section>
+            </section>
+        </main>
     </div>
 
     <script src="app.js"></script>
