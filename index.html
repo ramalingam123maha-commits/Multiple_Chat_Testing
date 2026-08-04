@@ -3,27 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
+    <title>Movie Search App</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <!-- API Key Modal -->
         <div id="apiKeyModal" class="modal">
-            <div class="modal-content">
-                <h2>Welcome to Weather Dashboard!</h2>
-                <p>To get started, you need an OpenWeatherMap API key.</p>
+            <div class="modal-content api-modal">
+                <h2>🎬 Welcome to Movie Search!</h2>
+                <p>To get started, you need an OMDB API key.</p>
                 <ol>
-                    <li>Visit <a href="https://openweathermap.org/api" target="_blank">https://openweathermap.org/api</a></li>
+                    <li>Visit <a href="https://www.omdbapi.com/apikey.aspx" target="_blank">https://www.omdbapi.com/apikey.aspx</a></li>
                     <li>Sign up for a free account</li>
-                    <li>Go to your API keys section</li>
                     <li>Copy your API key below</li>
                 </ol>
                 <input 
                     type="text" 
                     id="apiKeyInput" 
                     class="api-key-input" 
-                    placeholder="Paste your OpenWeatherMap API key here..."
+                    placeholder="Paste your OMDB API key here..."
                     autocomplete="off"
                 >
                 <button id="saveApiKeyBtn" class="api-key-btn">Save API Key</button>
@@ -31,39 +30,86 @@
             </div>
         </div>
 
-        <!-- Header with Search -->
+        <!-- Header -->
         <header class="header">
-            <h1 class="title">🌤️ Weather Dashboard</h1>
-            <div class="search-bar">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    class="search-input" 
-                    placeholder="Search for a city..."
-                    autocomplete="off"
-                >
-                <button id="searchBtn" class="search-btn">Search</button>
-                <div id="suggestions" class="suggestions"></div>
+            <div class="header-content">
+                <h1 class="app-title">🎬 MovieHub</h1>
+                <p class="app-subtitle">Search and discover your favorite movies</p>
             </div>
         </header>
 
-        <!-- Current Weather Section -->
-        <section class="current-weather">
-            <div id="weatherCard" class="weather-card">
-                <div class="loading">Loading weather data...</div>
-            </div>
-        </section>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar with Favorites -->
+            <aside class="sidebar">
+                <div class="favorites-container">
+                    <h2 class="favorites-title">⭐ Favorites</h2>
+                    <div id="favoritesList" class="favorites-list">
+                        <p class="empty-message">No favorites yet</p>
+                    </div>
+                    <button id="clearFavoritesBtn" class="clear-btn">Clear All</button>
+                </div>
+            </aside>
 
-        <!-- 5-Day Forecast Section -->
-        <section class="forecast-section">
-            <h2>5-Day Forecast</h2>
-            <div id="forecastContainer" class="forecast-container">
-                <div class="loading">Loading forecast...</div>
-            </div>
-        </section>
+            <!-- Main Movie Section -->
+            <section class="movie-section">
+                <!-- Search Bar -->
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="search-input" 
+                        placeholder="Search movies by title..."
+                        autocomplete="off"
+                    >
+                    <button id="searchBtn" class="search-btn">Search</button>
+                </div>
 
-        <!-- Error Message -->
-        <div id="errorMessage" class="error-message"></div>
+                <!-- Filter Options -->
+                <div class="filter-options">
+                    <select id="typeFilter" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="movie">Movies</option>
+                        <option value="series">Series</option>
+                    </select>
+                    <select id="yearFilter" class="filter-select">
+                        <option value="">Any Year</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                        <option value="2020">2020</option>
+                    </select>
+                </div>
+
+                <!-- Movies Grid -->
+                <div id="errorMessage" class="error-message"></div>
+                <div id="loadingSpinner" class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Searching for movies...</p>
+                </div>
+                <div id="moviesGrid" class="movies-grid">
+                    <p class="empty-state">👀 Start searching for movies!</p>
+                </div>
+
+                <!-- Pagination -->
+                <div id="paginationContainer" class="pagination-container">
+                    <button id="prevBtn" class="pagination-btn" disabled>← Previous</button>
+                    <span id="pageInfo" class="page-info"></span>
+                    <button id="nextBtn" class="pagination-btn" disabled>Next →</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Movie Detail Modal -->
+    <div id="movieModal" class="movie-modal">
+        <div class="movie-modal-content">
+            <button id="closeModalBtn" class="close-btn">&times;</button>
+            <div id="movieDetail" class="movie-detail">
+                <!-- Dynamic content loaded here -->
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

@@ -1,6 +1,18 @@
 // Configuration
-let API_KEY = localStorage.getItem('weatherApiKey') || '';
-const BASE_URL = 'https://api.openweathermap.org';
+let API_KEY = localStorage.getItem('omdbApiKey') || '';
+const OMDB_BASE_URL = 'https://www.omdbapi.com/';
+
+// State Management
+const state = {
+    searchResults: [],
+    currentPage: 1,
+    totalResults: 0,
+    favorites: JSON.parse(localStorage.getItem('movieFavorites')) || [],
+    currentFilters: {
+        type: '',
+        year: ''
+    }
+};
 
 // DOM Elements
 const apiKeyModal = document.getElementById('apiKeyModal');
@@ -8,355 +20,446 @@ const apiKeyInput = document.getElementById('apiKeyInput');
 const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
-const suggestionsDiv = document.getElementById('suggestions');
-const weatherCard = document.getElementById('weatherCard');
-const forecastContainer = document.getElementById('forecastContainer');
+const typeFilter = document.getElementById('typeFilter');
+const yearFilter = document.getElementById('yearFilter');
+const moviesGrid = document.getElementById('moviesGrid');
 const errorMessage = document.getElementById('errorMessage');
-
-// Weather icons mapping
-const weatherIcons = {
-    '01d': '☀️',
-    '01n': '🌙',
-    '02d': '⛅',
-    '02n': '☁️',
-    '03d': '☁️',
-    '03n': '☁️',
-    '04d': '☁️',
-    '04n': '☁️',
-    '09d': '🌧️',
-    '09n': '🌧️',
-    '10d': '🌧️',
-    '10n': '🌧️',
-    '11d': '⛈️',
-    '11n': '⛈️',
-    '13d': '❄️',
-    '13n': '❄️',
-    '50d': '🌫️',
-    '50n': '🌫️'
-};
-
-// Debounce timer for search suggestions
-let debounceTimer;
+const loadingSpinner = document.getElementById('loadingSpinner');
+const favoritesList = document.getElementById('favoritesList');
+const clearFavoritesBtn = document.getElementById('clearFavoritesBtn');
+const movieModal = document.getElementById('movieModal');
+const movieDetail = document.getElementById('movieDetail');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const pageInfo = document.getElementById('pageInfo');
+const paginationContainer = document.getElementById('paginationContainer');
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if API key exists
     if (!API_KEY) {
-        apiKeyModal.style.display = 'flex';
+        apiKeyModal.classList.add('active');
     } else {
-        apiKeyModal.style.display = 'none';
-        initializeWeather();
+        apiKeyModal.classList.remove('active');
     }
 
-    // API Key Modal Event Listener
-    saveApiKeyBtn.addEventListener('click', () => {
-        const key = apiKeyInput.value.trim();
-        if (key) {
-            API_KEY = key;
-            localStorage.setItem('weatherApiKey', API_KEY);
-            apiKeyModal.style.display = 'none';
-            initializeWeather();
-        } else {
-            showError('Please enter a valid API key');
+    // Event listeners
+    saveApiKeyBtn.addEventListener('click', handleSaveApiKey);
+    apiKeyInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSaveApiKey();
+    });
+
+    searchBtn.addEventListener('click', () => {
+        state.currentPage = 1;
+        handleSearch();
+    });
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            state.currentPage = 1;
+            handleSearch();
         }
     });
 
-    // Allow Enter key to save API key
-    apiKeyInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            saveApiKeyBtn.click();
+    typeFilter.addEventListener('change', () => {
+        state.currentPage = 1;
+        handleSearch();
+    });
+    yearFilter.addEventListener('change', () => {
+        state.currentPage = 1;
+        handleSearch();
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (state.currentPage > 1) {
+            state.currentPage--;
+            handleSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
-    // Event listeners for search
-    searchBtn.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', event => {
-        if (event.key === 'Enter') handleSearch();
+    nextBtn.addEventListener('click', () => {
+        const totalPages = Math.ceil(state.totalResults / 10);
+        if (state.currentPage < totalPages) {
+            state.currentPage++;
+            handleSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     });
-    searchInput.addEventListener('input', handleSearchInput);
+
+    clearFavoritesBtn.addEventListener('click', () => {
+        if (state.favorites.length > 0 && confirm('Are you sure you want to clear all favorites?')) {
+            state.favorites = [];
+            saveFavorites();
+            renderFavorites();
+        }
+    });
+
+    closeModalBtn.addEventListener('click', closeModal);
+    movieModal.addEventListener('click', (e) => {
+        if (e.target === movieModal) closeModal();
+    });
+
+    renderFavorites();
 });
 
-// Initialize weather display
-function initializeWeather() {
-    // Get weather for default city or current location
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
-                fetchWeatherByCoordinates(latitude, longitude);
-            },
-            error => {
-                console.log('Geolocation error:', error);
-                fetchWeatherByCity('London');
-            }
-        );
+// Handle save API key
+function handleSaveApiKey() {
+    const key = apiKeyInput.value.trim();
+    if (key) {
+        API_KEY = key;
+        localStorage.setItem('omdbApiKey', API_KEY);
+        apiKeyModal.classList.remove('active');
     } else {
-        fetchWeatherByCity('London');
+        showError('Please enter a valid API key');
     }
 }
 
-// Handle search input - show suggestions
-async function handleSearchInput(event) {
-    const query = event.target.value.trim();
-
-    clearTimeout(debounceTimer);
-    suggestionsDiv.innerHTML = '';
-
-    if (query.length < 2) return;
-
-    debounceTimer = setTimeout(async () => {
-        if (!API_KEY) {
-            showError('Please enter a valid API key');
-            return;
-        }
-
-        try {
-            const response = await fetch(
-                `${BASE_URL}/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
-            );
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    showError('Invalid API key. Please check your key and reload.');
-                    localStorage.removeItem('weatherApiKey');
-                }
-                return;
-            }
-
-            const cities = await response.json();
-
-            if (cities.length === 0) {
-                suggestionsDiv.innerHTML = '<div class="suggestion-item">No cities found</div>';
-                return;
-            }
-
-            cities.forEach(city => {
-                const suggestion = document.createElement('div');
-                suggestion.className = 'suggestion-item';
-                suggestion.innerHTML = `${city.name}${city.state ? ', ' + city.state : ''}, ${city.country}`;
-                suggestion.addEventListener('click', () => {
-                    searchInput.value = city.name;
-                    suggestionsDiv.innerHTML = '';
-                    fetchWeatherByCoordinates(city.lat, city.lon, city.name);
-                });
-                suggestionsDiv.appendChild(suggestion);
-            });
-        } catch (error) {
-            console.error('Error fetching suggestions:', error);
-            showError('Error fetching city suggestions');
-        }
-    }, 300);
-}
-
-// Handle search button click
-function handleSearch() {
+// Handle search
+async function handleSearch() {
     const query = searchInput.value.trim();
-    if (query) {
-        suggestionsDiv.innerHTML = '';
-        fetchWeatherByCity(query);
-    }
-}
-
-// Fetch weather by city name
-async function fetchWeatherByCity(cityName) {
-    if (!API_KEY) {
-        showError('Please enter a valid API key');
+    if (!query) {
+        showError('Please enter a movie title to search');
         return;
     }
 
+    state.currentFilters.type = typeFilter.value;
+    state.currentFilters.year = yearFilter.value;
+
+    showLoading(true);
+    clearError();
+
     try {
-        showError('');
-        weatherCard.innerHTML = '<div class="loading">Loading weather data...</div>';
+        let url = `${OMDB_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}&type=${state.currentFilters.type}&page=${state.currentPage}`;
         
-        // Get coordinates from city name
-        const geoResponse = await fetch(
-            `${BASE_URL}/geo/1.0/direct?q=${encodeURIComponent(cityName)}&limit=1&appid=${API_KEY}`
-        );
-
-        if (!geoResponse.ok) {
-            if (geoResponse.status === 401) {
-                showError('Invalid API key. Please reload and enter a valid key.');
-                localStorage.removeItem('weatherApiKey');
-            }
-            throw new Error('City not found');
+        if (state.currentFilters.year) {
+            url += `&y=${state.currentFilters.year}`;
         }
 
-        const cities = await geoResponse.json();
-        if (cities.length === 0) {
-            showError('City not found. Please try again.');
-            weatherCard.innerHTML = '';
-            return;
-        }
-
-        const { lat, lon, name, state, country } = cities[0];
-        await fetchWeatherByCoordinates(lat, lon, name);
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Error fetching weather data. Please check the city name.');
-        weatherCard.innerHTML = '';
-    }
-}
-
-// Fetch weather by coordinates
-async function fetchWeatherByCoordinates(lat, lon, cityName = '') {
-    if (!API_KEY) {
-        showError('Please enter a valid API key');
-        return;
-    }
-
-    try {
-        showError('');
-        weatherCard.innerHTML = '<div class="loading">Loading weather data...</div>';
-
-        const response = await fetch(
-            `${BASE_URL}/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
-        );
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                showError('Invalid API key. Please reload and enter a valid key.');
-                localStorage.removeItem('weatherApiKey');
-            }
-            throw new Error('Failed to fetch weather');
-        }
-
+        const response = await fetch(url);
         const data = await response.json();
-        displayCurrentWeather(data, cityName);
-        displayForecast(data);
+
+        if (data.Response === 'False') {
+            showError(data.Error || 'No movies found');
+            moviesGrid.innerHTML = '<p class="empty-state">😔 No results found. Try a different search!</p>';
+            state.searchResults = [];
+            state.totalResults = 0;
+        } else {
+            state.searchResults = data.Search || [];
+            state.totalResults = parseInt(data.totalResults) || 0;
+            renderMovies();
+            updatePagination();
+        }
     } catch (error) {
-        console.error('Error:', error);
-        showError('Error fetching weather data. Please try again.');
-        weatherCard.innerHTML = '';
+        console.error('Search error:', error);
+        showError('Error searching for movies. Please check your API key and try again.');
+    } finally {
+        showLoading(false);
     }
 }
 
-// Display current weather
-function displayCurrentWeather(data, cityName) {
-    const current = data.list[0];
-    const { main, weather, wind, clouds, visibility } = current;
-    const city = data.city.name;
-    const { lat, lon } = data.city.coord;
+// Render movies grid
+function renderMovies() {
+    if (state.searchResults.length === 0) {
+        moviesGrid.innerHTML = '<p class="empty-state">No movies found</p>';
+        paginationContainer.style.display = 'none';
+        return;
+    }
 
-    const weatherIcon = weatherIcons[weather[0].icon] || '🌡️';
-    const feelsLike = Math.round(main.feels_like);
-    const temp = Math.round(main.temp);
-    const description = weather[0].main;
+    moviesGrid.innerHTML = state.searchResults.map(movie => createMovieCard(movie)).join('');
+    paginationContainer.style.display = 'flex';
 
-    weatherCard.innerHTML = `
-        <div class="weather-header">
-            <h2>${cityName || city}</h2>
-            <p class="coordinates">Lat: ${lat.toFixed(2)}° | Lon: ${lon.toFixed(2)}°</p>
-        </div>
-        
-        <div class="weather-main">
-            <div class="weather-icon">${weatherIcon}</div>
-            <div class="weather-temp">
-                <div class="temperature">${temp}°C</div>
-                <div class="description">${description}</div>
-            </div>
-        </div>
+    // Attach event listeners to cards and favorite badges
+    document.querySelectorAll('.movie-card').forEach((card, index) => {
+        card.addEventListener('click', () => openModal(state.searchResults[index]));
+    });
 
-        <div class="weather-details">
-            <div class="detail-item">
-                <span class="detail-label">Feels Like</span>
-                <span class="detail-value">${feelsLike}°C</span>
+    document.querySelectorAll('.favorite-badge').forEach((badge, index) => {
+        badge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFavorite(state.searchResults[index]);
+            updateFavoriteBadge(badge, state.searchResults[index].imdbID);
+        });
+    });
+}
+
+// Create movie card HTML
+function createMovieCard(movie) {
+    const isFavorite = state.favorites.some(fav => fav.imdbID === movie.imdbID);
+    const posterUrl = movie.Poster !== 'N/A' ? movie.Poster : null;
+
+    return `
+        <div class="movie-card">
+            <div class="movie-poster">
+                ${posterUrl ? `<img src="${posterUrl}" alt="${movie.Title}" loading="lazy">` : '<div class="movie-poster-placeholder">🎬</div>'}
+                <div class="favorite-badge ${isFavorite ? 'active' : ''}" data-id="${movie.imdbID}">
+                    ${isFavorite ? '❤️' : '🤍'}
+                </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-label">Humidity</span>
-                <span class="detail-value">${main.humidity}%</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Wind Speed</span>
-                <span class="detail-value">${wind.speed.toFixed(1)} km/h</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Pressure</span>
-                <span class="detail-value">${main.pressure} hPa</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Visibility</span>
-                <span class="detail-value">${(visibility / 1000).toFixed(1)} km</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Cloud Cover</span>
-                <span class="detail-value">${clouds.all}%</span>
+            <div class="movie-info">
+                <h3 class="movie-title">${escapeHtml(movie.Title)}</h3>
+                <div class="movie-meta">
+                    <span class="movie-year">${movie.Year}</span>
+                    ${movie.imdbRating && movie.imdbRating !== 'N/A' ? `<span class="movie-rating">${movie.imdbRating}</span>` : ''}
+                </div>
+                <span class="movie-type">${movie.Type}</span>
             </div>
         </div>
     `;
 }
 
-// Display 5-day forecast
-function displayForecast(data) {
-    const forecastData = {};
+// Open movie detail modal
+async function openModal(movie) {
+    showLoading(true);
+    try {
+        const response = await fetch(`${OMDB_BASE_URL}?apikey=${API_KEY}&i=${movie.imdbID}&plot=full`);
+        const fullMovie = await response.json();
 
-    // Group forecast data by day
-    data.list.forEach(item => {
-        const date = new Date(item.dt * 1000);
-        const dayKey = date.toLocaleDateString();
-
-        if (!forecastData[dayKey]) {
-            forecastData[dayKey] = {
-                temps: [],
-                humidity: [],
-                wind: [],
-                weather: null,
-                icon: null
-            };
+        if (fullMovie.Response === 'False') {
+            showError('Could not load movie details');
+            return;
         }
 
-        forecastData[dayKey].temps.push(item.main.temp);
-        forecastData[dayKey].humidity.push(item.main.humidity);
-        forecastData[dayKey].wind.push(item.wind.speed);
-        
-        if (!forecastData[dayKey].weather) {
-            forecastData[dayKey].weather = item.weather[0].main;
-            forecastData[dayKey].icon = item.weather[0].icon;
-        }
-    });
+        const isFavorite = state.favorites.some(fav => fav.imdbID === fullMovie.imdbID);
+        const posterUrl = fullMovie.Poster !== 'N/A' ? fullMovie.Poster : null;
+        const rating = fullMovie.imdbRating !== 'N/A' ? fullMovie.imdbRating : 'N/A';
+        const ratingStars = getRatingStars(parseFloat(rating));
 
-    // Display first 5 days
-    forecastContainer.innerHTML = '';
-    const days = Object.keys(forecastData).slice(0, 5);
-
-    days.forEach((dayKey, index) => {
-        if (index === 0) return; // Skip today
-
-        const day = forecastData[dayKey];
-        const avgTemp = Math.round(day.temps.reduce((a, b) => a + b) / day.temps.length);
-        const minTemp = Math.round(Math.min(...day.temps));
-        const maxTemp = Math.round(Math.max(...day.temps));
-        const avgHumidity = Math.round(day.humidity.reduce((a, b) => a + b) / day.humidity.length);
-        const avgWind = (day.wind.reduce((a, b) => a + b) / day.wind.length).toFixed(1);
-        const icon = weatherIcons[day.icon] || '🌡️';
-
-        const date = new Date(dayKey);
-        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-        const forecastCard = document.createElement('div');
-        forecastCard.className = 'forecast-card';
-        forecastCard.innerHTML = `
-            <div class="forecast-date">
-                <div class="day-name">${dayName}</div>
-                <div class="date-str">${dateStr}</div>
+        movieDetail.innerHTML = `
+            <div class="detail-header">
+                <div class="detail-poster">
+                    ${posterUrl ? `<img src="${posterUrl}" alt="${fullMovie.Title}">` : '<div class="movie-poster-placeholder">🎬</div>'}
+                </div>
+                <div class="detail-info">
+                    <h1 class="detail-title">${escapeHtml(fullMovie.Title)}</h1>
+                    <div class="detail-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Year</div>
+                            <div class="meta-value">${fullMovie.Year}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Runtime</div>
+                            <div class="meta-value">${fullMovie.Runtime}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Genre</div>
+                            <div class="meta-value">${fullMovie.Genre}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Type</div>
+                            <div class="meta-value">${fullMovie.Type}</div>
+                        </div>
+                    </div>
+                    <div class="detail-rating">
+                        <span class="rating-stars">${ratingStars}</span>
+                        <span class="rating-value">${rating}/10</span>
+                    </div>
+                    <button class="favorite-btn ${isFavorite ? 'added' : ''}" onclick="toggleFavoriteFromModal('${escapeHtml(fullMovie.imdbID)}', '${escapeHtml(fullMovie.Title)}', '${posterUrl || ''}')">
+                        ${isFavorite ? '❤️ Added to Favorites' : '🤍 Add to Favorites'}
+                    </button>
+                </div>
             </div>
-            <div class="forecast-icon">${icon}</div>
-            <div class="forecast-desc">${day.weather}</div>
-            <div class="forecast-temps">
-                <span class="temp-max">${maxTemp}°</span>
-                <span class="temp-min">${minTemp}°</span>
+
+            <div class="detail-plot">
+                <div class="detail-plot-title">Plot</div>
+                <div class="detail-plot-text">${fullMovie.Plot !== 'N/A' ? escapeHtml(fullMovie.Plot) : 'Plot information not available'}</div>
             </div>
-            <div class="forecast-details">
-                <div><small>💧 ${avgHumidity}%</small></div>
-                <div><small>💨 ${avgWind} km/h</small></div>
+
+            <div class="detail-additional">
+                ${fullMovie.Director !== 'N/A' ? `
+                    <div class="additional-item">
+                        <div class="additional-item-title">Director</div>
+                        <div class="additional-item-content">${escapeHtml(fullMovie.Director)}</div>
+                    </div>
+                ` : ''}
+                ${fullMovie.Cast !== 'N/A' ? `
+                    <div class="additional-item">
+                        <div class="additional-item-title">Cast</div>
+                        <div class="additional-item-content">${escapeHtml(fullMovie.Cast)}</div>
+                    </div>
+                ` : ''}
+                ${fullMovie.Writer !== 'N/A' ? `
+                    <div class="additional-item">
+                        <div class="additional-item-title">Writer</div>
+                        <div class="additional-item-content">${escapeHtml(fullMovie.Writer)}</div>
+                    </div>
+                ` : ''}
+                ${fullMovie.Awards !== 'N/A' ? `
+                    <div class="additional-item">
+                        <div class="additional-item-title">Awards</div>
+                        <div class="additional-item-content">${escapeHtml(fullMovie.Awards)}</div>
+                    </div>
+                ` : ''}
+                ${fullMovie.imdbVotes !== 'N/A' ? `
+                    <div class="additional-item">
+                        <div class="additional-item-title">IMDb Votes</div>
+                        <div class="additional-item-content">${fullMovie.imdbVotes}</div>
+                    </div>
+                ` : ''}
+                ${fullMovie.Language !== 'N/A' ? `
+                    <div class="additional-item">
+                        <div class="additional-item-title">Language</div>
+                        <div class="additional-item-content">${escapeHtml(fullMovie.Language)}</div>
+                    </div>
+                ` : ''}
             </div>
         `;
-        forecastContainer.appendChild(forecastCard);
+
+        movieModal.classList.add('active');
+    } catch (error) {
+        console.error('Modal error:', error);
+        showError('Error loading movie details');
+    } finally {
+        showLoading(false);
+    }
+}
+
+// Close modal
+function closeModal() {
+    movieModal.classList.remove('active');
+}
+
+// Toggle favorite
+function toggleFavorite(movie) {
+    const index = state.favorites.findIndex(fav => fav.imdbID === movie.imdbID);
+    if (index > -1) {
+        state.favorites.splice(index, 1);
+    } else {
+        state.favorites.push({
+            imdbID: movie.imdbID,
+            Title: movie.Title,
+            Poster: movie.Poster,
+            Year: movie.Year
+        });
+    }
+    saveFavorites();
+    renderFavorites();
+}
+
+// Toggle favorite from modal
+function toggleFavoriteFromModal(imdbID, title, poster) {
+    const index = state.favorites.findIndex(fav => fav.imdbID === imdbID);
+    const btn = document.querySelector('.favorite-btn');
+    
+    if (index > -1) {
+        state.favorites.splice(index, 1);
+        btn.textContent = '🤍 Add to Favorites';
+        btn.classList.remove('added');
+    } else {
+        state.favorites.push({
+            imdbID,
+            Title: title,
+            Poster: poster,
+            Year: 'N/A'
+        });
+        btn.textContent = '❤️ Added to Favorites';
+        btn.classList.add('added');
+    }
+    saveFavorites();
+    renderFavorites();
+    
+    // Update favorite badges in grid
+    document.querySelectorAll('.favorite-badge').forEach(badge => {
+        if (badge.getAttribute('data-id') === imdbID) {
+            badge.textContent = index > -1 ? '🤍' : '❤️';
+            badge.classList.toggle('active');
+        }
     });
+}
+
+// Update favorite badge
+function updateFavoriteBadge(badge, imdbID) {
+    const isFavorite = state.favorites.some(fav => fav.imdbID === imdbID);
+    badge.textContent = isFavorite ? '❤️' : '🤍';
+    badge.classList.toggle('active');
+}
+
+// Render favorites list
+function renderFavorites() {
+    if (state.favorites.length === 0) {
+        favoritesList.innerHTML = '<p class="empty-message">No favorites yet</p>';
+        clearFavoritesBtn.style.opacity = '0.5';
+        clearFavoritesBtn.disabled = true;
+        return;
+    }
+
+    favoritesList.innerHTML = state.favorites.map(movie => `
+        <div class="favorite-item" onclick="searchFavorite('${escapeHtml(movie.Title)}')">
+            <span class="favorite-item-title">${escapeHtml(movie.Title)}</span>
+            <button class="favorite-item-remove" onclick="removeFavorite(event, '${movie.imdbID}')">×</button>
+        </div>
+    `).join('');
+
+    clearFavoritesBtn.style.opacity = '1';
+    clearFavoritesBtn.disabled = false;
+}
+
+// Search favorite movie
+function searchFavorite(title) {
+    searchInput.value = title;
+    state.currentPage = 1;
+    handleSearch();
+}
+
+// Remove favorite
+function removeFavorite(event, imdbID) {
+    event.stopPropagation();
+    const index = state.favorites.findIndex(fav => fav.imdbID === imdbID);
+    if (index > -1) {
+        state.favorites.splice(index, 1);
+        saveFavorites();
+        renderFavorites();
+        
+        // Update favorite badges
+        document.querySelectorAll('.favorite-badge').forEach(badge => {
+            if (badge.getAttribute('data-id') === imdbID) {
+                badge.textContent = '🤍';
+                badge.classList.remove('active');
+            }
+        });
+    }
+}
+
+// Save favorites to localStorage
+function saveFavorites() {
+    localStorage.setItem('movieFavorites', JSON.stringify(state.favorites));
+}
+
+// Update pagination
+function updatePagination() {
+    const totalPages = Math.ceil(state.totalResults / 10);
+    pageInfo.textContent = `Page ${state.currentPage} of ${totalPages}`;
+    
+    prevBtn.disabled = state.currentPage === 1;
+    nextBtn.disabled = state.currentPage >= totalPages;
+}
+
+// Show/hide loading spinner
+function showLoading(show) {
+    loadingSpinner.classList.toggle('show', show);
 }
 
 // Show error message
 function showError(message) {
     errorMessage.textContent = message;
-    errorMessage.style.display = message ? 'block' : 'none';
+    errorMessage.classList.add('show');
+}
+
+// Clear error message
+function clearError() {
+    errorMessage.classList.remove('show');
+    errorMessage.textContent = '';
+}
+
+// Get rating stars
+function getRatingStars(rating) {
+    if (rating === 0 || isNaN(rating)) return '⭐ 0';
+    const stars = Math.round(rating / 2);
+    return '⭐'.repeat(stars) || '⭐ 0';
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
