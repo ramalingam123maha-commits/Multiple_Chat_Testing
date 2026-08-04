@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Pet - Tamagotchi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .pet-name {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .pet-display {
+            background: linear-gradient(to bottom, #e0f7fa, #b3e5fc);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid #0288d1;
+        }
+
+        .pet-sprite {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .pet-sprite.sleeping {
+            animation: none;
+        }
+
+        .pet-sprite.sad {
+            animation: wobble 0.5s infinite;
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        .pet-status {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        .pet-status div {
+            margin: 5px 0;
+        }
+
+        .status-bars {
+            margin-top: 30px;
+            display: grid;
+            gap: 15px;
+        }
+
+        .status-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .status-label {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #999;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            width: 100%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            color: white;
+            font-weight: bold;
+        }
+
+        .bar-fill.hunger {
+            background: linear-gradient(90deg, #ff9800, #ffb74d);
+        }
+
+        .bar-fill.happiness {
+            background: linear-gradient(90deg, #e91e63, #f48fb1);
+        }
+
+        .bar-fill.energy {
+            background: linear-gradient(90deg, #2196f3, #64b5f6);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-feed {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+        }
+
+        .btn-sleep {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+        }
+
+        .btn-pet {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            color: white;
+        }
+
+        .btn-medicine {
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .info-panel {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .age-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .age-stat {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .age-stat-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .age-stat-label {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: bold;
+            min-height: 25px;
+            animation: fadeInOut 2s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            50% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-stat {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .quick-stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .quick-stat-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert.danger {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🎮 Virtual Pet</h1>
+        <div class="pet-name">Meet <strong id="petNameDisplay">Pixel</strong>!</div>
+
+        <div class="stats-grid">
+            <div class="quick-stat">
+                <div class="quick-stat-value" id="quickHunger">🍖 100%</div>
+                <div class="quick-stat-label">Hunger</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-value" id="quickHappiness">😄 100%</div>
+                <div class="quick-stat-label">Happiness</div>
+            </div>
+            <div class="quick-stat">
+                <div class="quick-stat-value" id="quickEnergy">⚡ 100%</div>
+                <div class="quick-stat-label">Energy</div>
+            </div>
+        </div>
+
+        <div id="alerts"></div>
+
+        <div class="pet-display">
+            <div class="pet-sprite" id="petSprite">🐱</div>
+            <div class="pet-status">
+                <div id="moodText">Your pet looks happy!</div>
+                <div id="actionText"></div>
+            </div>
+        </div>
+
+        <div class="status-bars">
+            <div class="status-bar">
+                <div class="status-label">
+                    <span>Hunger</span>
+                    <span id="hungerValue">100/100</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-fill hunger" id="hungerBar" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-label">
+                    <span>Happiness</span>
+                    <span id="happinessValue">100/100</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-fill happiness" id="happinessBar" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-label">
+                    <span>Energy</span>
+                    <span id="energyValue">100/100</span>
+                </div>
+                <div class="bar">
+                    <div class="bar-fill energy" id="energyBar" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-feed" id="feedBtn">🍖 Feed</button>
+            <button class="btn-play" id="playBtn">🎮 Play</button>
+            <button class="btn-sleep" id="sleepBtn">😴 Sleep</button>
+            <button class="btn-pet" id="petBtn">🤚 Pet</button>
+            <button class="btn-medicine" id="medicineBtn">💊 Medicine</button>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="info-panel">
+            <strong>Pet Stats:</strong>
+            <div class="age-stats">
+                <div class="age-stat">
+                    <div class="age-stat-value" id="ageValue">0</div>
+                    <div class="age-stat-label">Age (seconds)</div>
+                </div>
+                <div class="age-stat">
+                    <div class="age-stat-value" id="scoreValue">0</div>
+                    <div class="age-stat-label">Care Score</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class VirtualPet {
+            constructor() {
+                this.hunger = 100;
+                this.happiness = 100;
+                this.energy = 100;
+                this.isSleeping = false;
+                this.isPlaying = false;
+                this.isSick = false;
+                this.age = 0;
+                this.careScore = 0;
+                this.name = this.getRandomPetName();
+
+                this.elements = {
+                    hungerBar: document.getElementById('hungerBar'),
+                    happinessBar: document.getElementById('happinessBar'),
+                    energyBar: document.getElementById('energyBar'),
+                    hungerValue: document.getElementById('hungerValue'),
+                    happinessValue: document.getElementById('happinessValue'),
+                    energyValue: document.getElementById('energyValue'),
+                    petSprite: document.getElementById('petSprite'),
+                    moodText: document.getElementById('moodText'),
+                    actionText: document.getElementById('actionText'),
+                    message: document.getElementById('message'),
+                    feedBtn: document.getElementById('feedBtn'),
+                    playBtn: document.getElementById('playBtn'),
+                    sleepBtn: document.getElementById('sleepBtn'),
+                    petBtn: document.getElementById('petBtn'),
+                    medicineBtn: document.getElementById('medicineBtn'),
+                    quickHunger: document.getElementById('quickHunger'),
+                    quickHappiness: document.getElementById('quickHappiness'),
+                    quickEnergy: document.getElementById('quickEnergy'),
+                    ageValue: document.getElementById('ageValue'),
+                    scoreValue: document.getElementById('scoreValue'),
+                    petNameDisplay: document.getElementById('petNameDisplay'),
+                    alerts: document.getElementById('alerts'),
+                    quickHunger: document.getElementById('quickHunger'),
+                };
+
+                this.pets = ['🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+                this.elements.petSprite.textContent = this.pets[Math.floor(Math.random() * this.pets.length)];
+                this.elements.petNameDisplay.textContent = this.name;
+
+                this.setupEventListeners();
+                this.startDecayInterval();
+                this.startUpdateInterval();
+                this.startAgeInterval();
+            }
+
+            getRandomPetName() {
+                const names = ['Pixel', 'Fluffy', 'Buddy', 'Lucky', 'Chip', 'Spark', 'Whiskers', 'Patches', 'Ziggy', 'Nova'];
+                return names[Math.floor(Math.random() * names.length)];
+            }
+
+            setupEventListeners() {
+                this.elements.feedBtn.addEventListener('click', () => this.feed());
+                this.elements.playBtn.addEventListener('click', () => this.play());
+                this.elements.sleepBtn.addEventListener('click', () => this.sleep());
+                this.elements.petBtn.addEventListener('click', () => this.pet());
+                this.elements.medicineBtn.addEventListener('click', () => this.takeMedicine());
+            }
+
+            startDecayInterval() {
+                setInterval(() => {
+                    if (!this.isSleeping) {
+                        this.hunger = Math.max(0, this.hunger - 1);
+                        this.happiness = Math.max(0, this.happiness - 0.8);
+                        this.energy = Math.max(0, this.energy - 0.5);
+                    } else {
+                        // While sleeping, restore energy and slightly reduce hunger
+                        this.energy = Math.min(100, this.energy + 2);
+                        this.hunger = Math.max(0, this.hunger - 0.3);
+                    }
+
+                    // Sickness penalty
+                    if (this.isSick) {
+                        this.happiness = Math.max(0, this.happiness - 1.5);
+                        this.energy = Math.max(0, this.energy - 1);
+                    }
+
+                    // Random sickness chance if hygiene is poor
+                    if (this.happiness < 30 && Math.random() < 0.01) {
+                        this.isSick = true;
+                    }
+
+                    this.updateDisplay();
+                }, 1000); // Update every second
+            }
+
+            startUpdateInterval() {
+                setInterval(() => {
+                    this.updateMood();
+                    this.updateButtons();
+                }, 500);
+            }
+
+            startAgeInterval() {
+                setInterval(() => {
+                    this.age++;
+                    this.elements.ageValue.textContent = this.age;
+                }, 1000);
+            }
+
+            feed() {
+                if (this.isSleeping) {
+                    this.showMessage('Your pet is sleeping!');
+                    return;
+                }
+
+                this.hunger = Math.min(100, this.hunger + 40);
+                this.happiness = Math.max(0, this.happiness - 5); // Eating alone reduces happiness
+                this.energy = Math.max(0, this.energy - 3);
+                this.careScore += 10;
+
+                this.showMessage('😋 Nom nom! Your pet is eating!');
+                this.showAlert('Fed', 'success');
+                this.updateDisplay();
+            }
+
+            play() {
+                if (this.isSleeping) {
+                    this.showMessage('Your pet is sleeping!');
+                    return;
+                }
+
+                if (this.energy < 20) {
+                    this.showMessage('Your pet is too tired to play!');
+                    this.showAlert('Pet too tired', 'warning');
+                    return;
+                }
+
+                this.isPlaying = true;
+                this.happiness = Math.min(100, this.happiness + 30);
+                this.energy = Math.max(0, this.energy - 25);
+                this.hunger = Math.max(0, this.hunger - 15);
+                this.careScore += 20;
+
+                this.showMessage('🎉 Wheee! Your pet is playing!');
+                this.showAlert('Playing', 'success');
+
+                setTimeout(() => {
+                    this.isPlaying = false;
+                }, 1500);
+
+                this.updateDisplay();
+            }
+
+            sleep() {
+                this.isSleeping = !this.isSleeping;
+                this.showMessage(this.isSleeping ? '😴 Your pet is now sleeping...' : '👁️ Your pet woke up!');
+                if (!this.isSleeping) {
+                    this.showAlert('Pet woke up', 'success');
+                }
+                this.updateDisplay();
+            }
+
+            pet() {
+                if (this.isSleeping) {
+                    this.showMessage('Your pet is sleeping!');
+                    return;
+                }
+
+                this.happiness = Math.min(100, this.happiness + 15);
+                this.energy = Math.max(0, this.energy - 2);
+                this.careScore += 5;
+
+                const pettingMessages = ['🤚 Aww, that feels nice!', '😻 Purr purr!', '🐕 Woof woof!', '💕 Your pet loves you!'];
+                this.showMessage(pettingMessages[Math.floor(Math.random() * pettingMessages.length)]);
+                this.showAlert('Pet loved it', 'success');
+
+                this.updateDisplay();
+            }
+
+            takeMedicine() {
+                if (!this.isSick) {
+                    this.showMessage('Your pet is already healthy!');
+                    return;
+                }
+
+                this.isSick = false;
+                this.happiness = Math.min(100, this.happiness + 20);
+                this.careScore += 15;
+
+                this.showMessage('💊 Your pet feels better!');
+                this.showAlert('Pet healed!', 'success');
+
+                this.updateDisplay();
+            }
+
+            updateDisplay() {
+                const hungerPercent = Math.max(0, Math.min(100, this.hunger));
+                const happinessPercent = Math.max(0, Math.min(100, this.happiness));
+                const energyPercent = Math.max(0, Math.min(100, this.energy));
+
+                this.elements.hungerBar.style.width = hungerPercent + '%';
+                this.elements.happinessBar.style.width = happinessPercent + '%';
+                this.elements.energyBar.style.width = energyPercent + '%';
+
+                this.elements.hungerValue.textContent = `${Math.round(hungerPercent)}/100`;
+                this.elements.happinessValue.textContent = `${Math.round(happinessPercent)}/100`;
+                this.elements.energyValue.textContent = `${Math.round(energyPercent)}/100`;
+
+                this.elements.quickHunger.innerHTML = `🍖 ${Math.round(hungerPercent)}%`;
+                this.elements.quickHappiness.innerHTML = `😄 ${Math.round(happinessPercent)}%`;
+                this.elements.quickEnergy.innerHTML = `⚡ ${Math.round(energyPercent)}%`;
+
+                this.elements.scoreValue.textContent = this.careScore;
+
+                this.updateSprite();
+            }
+
+            updateMood() {
+                let mood = '😊';
+                let moodText = 'Your pet looks happy!';
+
+                if (this.isSleeping) {
+                    mood = '😴';
+                    moodText = 'Your pet is sleeping...';
+                    this.elements.petSprite.classList.add('sleeping');
+                } else if (this.isPlaying) {
+                    mood = '🤪';
+                    moodText = 'Your pet is having fun!';
+                    this.elements.petSprite.classList.remove('sleeping');
+                } else if (this.isSick) {
+                    mood = '🤒';
+                    moodText = 'Your pet is sick! Give it medicine!';
+                    this.elements.petSprite.classList.add('sad');
+                } else if (this.hunger > 80) {
+                    mood = '😋';
+                    moodText = 'Your pet is very hungry!';
+                    this.elements.petSprite.classList.add('sad');
+                } else if (this.happiness < 30) {
+                    mood = '😢';
+                    moodText = 'Your pet is sad. Play with it!';
+                    this.elements.petSprite.classList.add('sad');
+                } else if (this.energy < 30) {
+                    mood = '😑';
+                    moodText = 'Your pet is tired. Let it sleep!';
+                    this.elements.petSprite.classList.remove('sad');
+                } else {
+                    this.elements.petSprite.classList.remove('sad');
+                }
+
+                this.elements.moodText.textContent = moodText;
+            }
+
+            updateSprite() {
+                if (this.isSleeping) {
+                    this.elements.petSprite.style.animation = 'none';
+                } else if (this.isPlaying) {
+                    this.elements.petSprite.style.animation = 'bounce 0.5s infinite';
+                } else {
+                    this.elements.petSprite.style.animation = 'bounce 1s infinite';
+                }
+            }
+
+            updateButtons() {
+                const canInteract = !this.isSleeping;
+                this.elements.feedBtn.disabled = !canInteract;
+                this.elements.playBtn.disabled = !canInteract;
+                this.elements.petBtn.disabled = !canInteract;
+                this.elements.medicineBtn.disabled = !this.isSick;
+
+                if (this.energy < 20) {
+                    this.elements.playBtn.disabled = true;
+                }
+            }
+
+            showMessage(text) {
+                this.elements.message.textContent = text;
+                this.elements.message.style.animation = 'none';
+                setTimeout(() => {
+                    this.elements.message.style.animation = 'fadeInOut 2s ease-in-out';
+                }, 10);
+            }
+
+            showAlert(text, type = 'success') {
+                const alert = document.createElement('div');
+                alert.className = `alert ${type}`;
+                alert.textContent = text;
+                this.elements.alerts.appendChild(alert);
+
+                setTimeout(() => {
+                    alert.remove();
+                }, 2500);
+            }
+        }
+
+        // Initialize the game when the page loads
+        window.addEventListener('load', () => {
+            new VirtualPet();
+        });
+    </script>
+</body>
+</html>
