@@ -37,11 +37,14 @@ const server = http.createServer((req, res) => {
   // ── GET /api/polls ──
   if (pathname === '/api/polls' && req.method === 'GET') {
     const allPolls = Array.from(polls.values()).map(poll => ({
-      ...poll,
+      id: poll.id,
+      question: poll.question,
       options: poll.options.map(opt => ({
+        id: opt.id,
         text: opt.text,
         votes: opt.voteCount
       })),
+      createdAt: poll.createdAt,
       totalVotes: poll.options.reduce((sum, opt) => sum + opt.voteCount, 0)
     }));
     res.writeHead(200, { 'Content-Type': 'application/json' });
