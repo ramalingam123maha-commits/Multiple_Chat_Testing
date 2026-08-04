@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Birthday Reminder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🎂</span>
+        <span class="logo-text">Birthday<strong>Remind</strong></span>
+      </div>
+      <p class="header-sub">Never forget a birthday again</p>
+    </div>
+  </header>
+
+  <!-- ═══════════════ MAIN LAYOUT ═══════════════ -->
+  <main class="main-grid">
+
+    <!-- ── LEFT PANEL: Add Friend ── -->
+    <section class="panel add-panel" aria-labelledby="add-heading">
+      <h2 id="add-heading" class="panel-title">
+        <span class="panel-icon">✨</span> Add a Friend
+      </h2>
+
+      <form id="addForm" novalidate>
+        <div class="field-group">
+          <label for="friendName">Friend's Name</label>
+          <input
+            type="text"
+            id="friendName"
+            placeholder="e.g. Alex Johnson"
+            autocomplete="off"
+            maxlength="50"
+            required
+          />
+          <span class="field-error" id="nameError"></span>
+        </div>
+
+        <div class="field-group">
+          <label for="friendBirthday">Birthday</label>
+          <input
+            type="date"
+            id="friendBirthday"
+            required
+          />
+          <span class="field-error" id="dateError"></span>
+        </div>
+
+        <div class="field-group">
+          <label for="friendNote">Personal Note <span class="optional">(optional)</span></label>
+          <input
+            type="text"
+            id="friendNote"
+            placeholder="e.g. Loves cats & coffee"
+            maxlength="100"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          <span class="btn-icon">🎉</span> Add Birthday
+        </button>
+      </form>
+
+      <!-- Stats bar -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stat">
+          <span class="stat-num" id="statTotal">0</span>
+          <span class="stat-label">Friends</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num" id="statThisMonth">0</span>
+          <span class="stat-label">This Month</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num" id="statNext7">0</span>
+          <span class="stat-label">Next 7 Days</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RIGHT PANEL: Upcoming Birthdays ── -->
+    <section class="panel list-panel" aria-labelledby="list-heading">
+      <div class="list-header">
+        <h2 id="list-heading" class="panel-title">
+          <span class="panel-icon">🗓️</span> Upcoming Birthdays
+        </h2>
+        <div class="list-controls">
+          <input
+            type="search"
+            id="searchBox"
+            placeholder="Search…"
+            aria-label="Search birthdays"
+          />
+          <select id="filterSelect" aria-label="Filter">
+            <option value="all">All</option>
+            <option value="7">Next 7 days</option>
+            <option value="30">Next 30 days</option>
+            <option value="90">Next 90 days</option>
+          </select>
+        </div>
+      </div>
+
+      <ul class="birthday-list" id="birthdayList" aria-live="polite">
+        <!-- populated by JS -->
+      </ul>
+
+      <div class="empty-state" id="emptyState" hidden>
+        <div class="empty-icon">🎈</div>
+        <p>No birthdays yet — add your first friend!</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════ GREETING CARD MODAL ═══════════════ -->
+  <div class="modal-backdrop" id="cardModal" role="dialog" aria-modal="true" aria-labelledby="cardModalTitle" hidden>
+    <div class="modal-box">
+      <button class="modal-close" id="closeModal" aria-label="Close">&times;</button>
+
+      <div class="card-preview" id="cardPreview">
+        <div class="card-confetti" aria-hidden="true" id="confettiArea"></div>
+        <div class="card-content">
+          <p class="card-salutation">Happy Birthday,</p>
+          <p class="card-name" id="cardName">Friend!</p>
+          <div class="card-balloons" aria-hidden="true">🎈🎂🎁🎊🎉</div>
+          <p class="card-message" id="cardMessage">
+            Wishing you a wonderful day filled with joy, laughter and all your favourite things!
+          </p>
+          <p class="card-signature">— Sent with 💖 via BirthdayRemind</p>
+        </div>
+      </div>
+
+      <h2 id="cardModalTitle" class="modal-heading">Send a Virtual Greeting Card</h2>
+      <p class="modal-sub">Personalise your message to <strong id="cardRecipientLabel"></strong></p>
+
+      <div class="field-group">
+        <label for="cardTheme">Card Theme</label>
+        <div class="theme-picker" id="themePicker">
+          <button class="theme-btn active" data-theme="pink"   title="Pink">🌸</button>
+          <button class="theme-btn"        data-theme="blue"   title="Blue">💙</button>
+          <button class="theme-btn"        data-theme="gold"   title="Gold">✨</button>
+          <button class="theme-btn"        data-theme="purple" title="Purple">💜</button>
+          <button class="theme-btn"        data-theme="green"  title="Green">🍀</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="cardCustomMsg">Your Message</label>
+        <textarea id="cardCustomMsg" rows="3" maxlength="200"
+          placeholder="Write something heartfelt…"></textarea>
+        <span class="char-counter"><span id="cardMsgLen">0</span>/200</span>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="closeModal2">Cancel</button>
+        <button class="btn btn-primary" id="sendCardBtn">
+          <span class="btn-icon">💌</span> Send Card
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SUCCESS TOAST ═══════════════ -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ═══════════════ DELETE CONFIRM ═══════════════ -->
+  <div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle" hidden>
+    <div class="modal-box modal-box--sm">
+      <h2 id="deleteModalTitle" class="modal-heading">Remove Birthday?</h2>
+      <p class="modal-sub">Are you sure you want to remove <strong id="deleteTargetName"></strong>?</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" id="cancelDelete">Cancel</button>
+        <button class="btn btn-danger" id="confirmDelete">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
