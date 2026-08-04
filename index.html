@@ -3,92 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Code Snippet Manager</title>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <title>Chirp — Microblogging</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <section class="hero" aria-labelledby="page-title">
-      <div>
-        <p class="eyebrow">Developer Toolkit</p>
-        <h1 id="page-title">Code Snippet Manager</h1>
-        <p class="hero-copy">Save, tag, search, edit, and copy reusable snippets with Prism.js syntax highlighting.</p>
+
+  <!-- ===== LEFT SIDEBAR NAV ===== -->
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <div class="nav-logo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 001.88-2.37 8.59 8.59 0 01-2.72 1.04 4.28 4.28 0 00-7.29 3.9A12.14 12.14 0 013 4.79a4.28 4.28 0 001.32 5.71 4.24 4.24 0 01-1.94-.54v.05a4.28 4.28 0 003.44 4.2 4.3 4.3 0 01-1.93.07 4.28 4.28 0 004 2.97A8.6 8.6 0 012 19.54a12.12 12.12 0 006.56 1.92c7.88 0 12.19-6.53 12.19-12.19 0-.19 0-.37-.01-.56A8.7 8.7 0 0022.46 6z"/></svg>
+    </div>
+    <ul class="nav-links">
+      <li><button class="nav-item active" data-view="home" aria-label="Home">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </button></li>
+      <li><button class="nav-item" data-view="explore" aria-label="Explore">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <span>Explore</span>
+      </button></li>
+      <li><button class="nav-item" data-view="notifications" aria-label="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5S10.5 3.17 10.5 4v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <span>Notifications</span>
+        <span class="nav-badge" id="notifBadge">3</span>
+      </button></li>
+      <li><button class="nav-item" data-view="profile" aria-label="Profile" id="navProfileBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        <span>Profile</span>
+      </button></li>
+    </ul>
+    <button class="chirp-btn" id="openComposeBtn" aria-label="New post">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      <span>Chirp</span>
+    </button>
+    <button class="nav-avatar-btn" id="navAvatarBtn" aria-label="Account">
+      <img src="" alt="Your avatar" id="currentUserAvatar" class="avatar avatar-sm" />
+      <div class="nav-user-info">
+        <span class="nav-user-name" id="currentUserName">Alex Morgan</span>
+        <span class="nav-user-handle" id="currentUserHandle">@alexmorgan</span>
       </div>
-      <button class="primary-action" id="newSnippetButton" type="button">Add snippet</button>
-    </section>
+    </button>
+  </nav>
 
-    <section class="workspace">
-      <aside class="panel controls" aria-label="Snippet filters">
-        <label class="field-label" for="searchInput">Search snippets</label>
-        <input id="searchInput" class="search-input" type="search" placeholder="Search title, code, notes, or tags" autocomplete="off" />
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content">
 
-        <div class="filter-block">
-          <div class="filter-header">
-            <h2>Tags</h2>
-            <button class="text-button" id="clearFiltersButton" type="button">Clear</button>
+    <!-- HOME FEED -->
+    <section class="view active" id="view-home" aria-label="Home feed">
+      <header class="view-header">
+        <h1>Home</h1>
+        <button class="icon-btn" id="refreshBtn" aria-label="Refresh feed" title="Refresh">
+          <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </button>
+      </header>
+
+      <!-- COMPOSE INLINE -->
+      <div class="compose-box" id="inlineCompose">
+        <img src="" alt="" class="avatar avatar-md" id="composeAvatar" />
+        <div class="compose-inner">
+          <div class="compose-tabs">
+            <button class="compose-tab active" data-audience="everyone">Everyone</button>
+            <button class="compose-tab" data-audience="followers">Followers</button>
           </div>
-          <div class="tag-list" id="tagFilters" aria-label="Filter by tag"></div>
+          <textarea class="compose-textarea" id="composeText" placeholder="What's chirping?" maxlength="280" aria-label="Compose post" rows="2"></textarea>
+          <div class="compose-meta">
+            <div class="compose-hashtag-pills" id="composePills"></div>
+          </div>
+          <div class="compose-toolbar">
+            <div class="compose-actions">
+              <button class="compose-icon-btn" id="addHashtagBtn" title="Add hashtag" aria-label="Add hashtag">
+                <svg viewBox="0 0 24 24"><path d="M17 11V5l-5-3-5 3v6L2 14l5 3v5l5-3 5 3v-5l5-3-5-3zm-3 6.56l-2 1.2-2-1.2v-2.56l2 1.2 2-1.2v2.56zm2-8l-2 1.2-2-1.2V7.44l2-1.2 2 1.2v2.12z"/></svg>
+              </button>
+              <span class="char-counter" id="charCounter">280</span>
+            </div>
+            <button class="chirp-btn chirp-btn-sm" id="postBtn" disabled>Post</button>
+          </div>
+          <!-- hashtag suggestion dropdown -->
+          <div class="hashtag-dropdown hidden" id="hashtagDropdown" role="listbox" aria-label="Hashtag suggestions"></div>
         </div>
-      </aside>
+      </div>
 
-      <section class="snippet-area" aria-live="polite">
-        <div class="snippet-toolbar">
-          <p id="snippetCount"></p>
-          <select id="languageFilter" aria-label="Filter by language">
-            <option value="all">All languages</option>
-          </select>
-        </div>
-        <div class="snippet-grid" id="snippetGrid"></div>
-        <p class="empty-state" id="emptyState" hidden>No snippets match your filters.</p>
-      </section>
+      <div class="feed-divider"></div>
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="for-you">For You</button>
+        <button class="tab-btn" data-tab="following">Following</button>
+      </div>
+
+      <div class="feed" id="feed" aria-live="polite" aria-label="Post feed"></div>
     </section>
+
+    <!-- EXPLORE VIEW -->
+    <section class="view hidden" id="view-explore" aria-label="Explore">
+      <header class="view-header">
+        <h1>Explore</h1>
+      </header>
+      <div class="explore-search-wrap">
+        <svg class="explore-search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input class="explore-search" id="exploreSearch" type="search" placeholder="Search hashtags and posts…" aria-label="Search" />
+      </div>
+      <div class="explore-results" id="exploreResults" aria-live="polite"></div>
+    </section>
+
+    <!-- NOTIFICATIONS VIEW -->
+    <section class="view hidden" id="view-notifications" aria-label="Notifications">
+      <header class="view-header">
+        <h1>Notifications</h1>
+        <button class="text-btn" id="clearNotifBtn">Mark all read</button>
+      </header>
+      <ul class="notif-list" id="notifList" aria-live="polite"></ul>
+    </section>
+
+    <!-- PROFILE VIEW -->
+    <section class="view hidden" id="view-profile" aria-label="Your profile">
+      <header class="view-header profile-view-header">
+        <div class="profile-banner" id="profileBanner"></div>
+        <div class="profile-info-row">
+          <img src="" alt="Profile avatar" class="avatar avatar-lg profile-avatar" id="profileAvatar" />
+          <button class="secondary-btn edit-profile-btn" id="editProfileBtn">Edit profile</button>
+        </div>
+        <div class="profile-meta">
+          <h1 id="profileName">Alex Morgan</h1>
+          <span class="handle" id="profileHandle">@alexmorgan</span>
+          <p class="bio" id="profileBio">Building things on the internet ✨</p>
+          <div class="profile-stats">
+            <span><strong id="profileFollowing">142</strong> Following</span>
+            <span><strong id="profileFollowers">1.2K</strong> Followers</span>
+            <span><strong id="profilePosts">—</strong> Posts</span>
+          </div>
+        </div>
+        <div class="tab-bar profile-tabs">
+          <button class="tab-btn active" data-ptab="posts">Posts</button>
+          <button class="tab-btn" data-ptab="likes">Likes</button>
+        </div>
+      </header>
+      <div class="feed" id="profileFeed" aria-live="polite" aria-label="Your posts"></div>
+    </section>
+
   </main>
 
-  <dialog class="snippet-dialog" id="snippetDialog">
-    <form id="snippetForm" method="dialog">
-      <div class="dialog-header">
-        <h2 id="dialogTitle">Add snippet</h2>
-        <button class="icon-button" id="closeDialogButton" type="button" aria-label="Close dialog">×</button>
+  <!-- ===== RIGHT SIDEBAR ===== -->
+  <aside class="right-sidebar" aria-label="Trending and suggestions">
+    <div class="sidebar-search-wrap">
+      <svg class="sidebar-search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input class="sidebar-search" id="sidebarSearch" type="search" placeholder="Search Chirp" aria-label="Search Chirp" />
+    </div>
+
+    <!-- TRENDING -->
+    <div class="widget" id="trendingWidget">
+      <h2 class="widget-title">Trending now</h2>
+      <ul class="trending-list" id="trendingList" aria-label="Trending topics"></ul>
+    </div>
+
+    <!-- WHO TO FOLLOW -->
+    <div class="widget" id="followWidget">
+      <h2 class="widget-title">Who to follow</h2>
+      <ul class="follow-list" id="followList" aria-label="Suggested users"></ul>
+    </div>
+  </aside>
+
+  <!-- ===== COMPOSE MODAL ===== -->
+  <div class="modal-overlay hidden" id="composeModal" role="dialog" aria-modal="true" aria-label="Compose post">
+    <div class="modal-card compose-modal-card">
+      <button class="modal-close" id="closeComposeModal" aria-label="Close">×</button>
+      <div class="compose-box modal-compose">
+        <img src="" alt="" class="avatar avatar-md" id="modalComposeAvatar" />
+        <div class="compose-inner">
+          <textarea class="compose-textarea" id="modalComposeText" placeholder="What's chirping?" maxlength="280" aria-label="Compose post" rows="4"></textarea>
+          <div class="compose-toolbar">
+            <div class="compose-actions">
+              <span class="char-counter" id="modalCharCounter">280</span>
+            </div>
+            <button class="chirp-btn chirp-btn-sm" id="modalPostBtn" disabled>Post</button>
+          </div>
+        </div>
       </div>
+    </div>
+  </div>
 
-      <input type="hidden" id="snippetId" />
+  <!-- ===== HASHTAG FOLLOW TOAST ===== -->
+  <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 
-      <label class="field-label" for="titleInput">Title</label>
-      <input id="titleInput" type="text" required maxlength="80" placeholder="Array dedupe helper" />
-
-      <label class="field-label" for="languageInput">Language</label>
-      <select id="languageInput" required>
-        <option value="javascript">JavaScript</option>
-        <option value="typescript">TypeScript</option>
-        <option value="css">CSS</option>
-        <option value="html">HTML</option>
-        <option value="python">Python</option>
-        <option value="bash">Bash</option>
-        <option value="json">JSON</option>
-      </select>
-
-      <label class="field-label" for="tagsInput">Tags <span>(comma separated)</span></label>
-      <input id="tagsInput" type="text" placeholder="arrays, utility, frontend" />
-
-      <label class="field-label" for="descriptionInput">Notes</label>
-      <textarea id="descriptionInput" rows="3" placeholder="When to use this snippet"></textarea>
-
-      <label class="field-label" for="codeInput">Code</label>
-      <textarea id="codeInput" rows="9" required spellcheck="false" placeholder="Paste your code here"></textarea>
-
-      <div class="dialog-actions">
-        <button class="secondary-action" id="cancelButton" type="button">Cancel</button>
-        <button class="primary-action" type="submit">Save snippet</button>
+  <!-- ===== EDIT PROFILE MODAL ===== -->
+  <div class="modal-overlay hidden" id="editProfileModal" role="dialog" aria-modal="true" aria-label="Edit profile">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Edit Profile</h2>
+        <button class="modal-close" id="closeEditProfile" aria-label="Close">×</button>
       </div>
-    </form>
-  </dialog>
+      <form id="editProfileForm" class="edit-profile-form">
+        <label class="field-label" for="editName">Display name</label>
+        <input id="editName" type="text" class="field-input" maxlength="50" required />
+        <label class="field-label" for="editHandle">Handle</label>
+        <div class="handle-input-wrap"><span>@</span><input id="editHandle" type="text" class="field-input" maxlength="20" required /></div>
+        <label class="field-label" for="editBio">Bio</label>
+        <textarea id="editBio" class="field-input" rows="3" maxlength="160"></textarea>
+        <div class="modal-footer">
+          <button type="button" class="secondary-btn" id="cancelEditProfile">Cancel</button>
+          <button type="submit" class="chirp-btn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
