@@ -1,232 +1,206 @@
-# 🌤️ Weather Dashboard
+# 🎬 MovieHub - Movie Search App
 
-A modern, responsive weather dashboard application that fetches real-time weather data from the OpenWeatherMap API. Get current weather conditions, detailed metrics, and a 5-day forecast with beautiful weather icons and intuitive UI.
+A modern, responsive movie search application built with vanilla JavaScript and the OMDB API. Search for movies, manage your favorites, and explore detailed movie information in an elegant dark-themed interface.
 
-## Features
+## 🌟 Features
 
-✨ **Current Weather Display**
-- Real-time temperature and "feels like" temperature
-- Weather condition with descriptive icons
-- Location coordinates display
-- Automatic geolocation detection on startup
+### Core Features
+- **🔍 Advanced Movie Search** - Search movies by title with real-time results
+- **📄 Pagination** - Navigate through search results with next/previous buttons
+- **🎯 Filtering** - Filter movies by type (Movie/Series) and release year
+- **⭐ Favorites Management** - Save your favorite movies and manage them in a dedicated sidebar
+- **📋 Detailed Movie Modal** - Click any movie to view comprehensive details including:
+  - Full plot description
+  - Director, cast, and writers
+  - IMDb ratings and votes
+  - Awards information
+  - Language and runtime details
+  - Beautiful poster images
 
-📊 **Current Conditions Details**
-- **Humidity**: Current moisture levels
-- **Wind Speed**: In km/h
-- **Feels Like**: Temperature adjusted for wind chill
-- **Visibility**: Horizontal visibility in km
-- **Pressure**: Atmospheric pressure in hPa
-- **Cloud Cover**: Percentage of cloud coverage
+### Design & UX
+- **🌙 Dark Theme UI** - Modern dark gradient background with vibrant accents
+- **📱 Fully Responsive** - Works perfectly on desktop, tablet, and mobile devices
+- **⚡ Smooth Animations** - Polished transitions and hover effects
+- **♿ Accessible** - Semantic HTML and keyboard navigation support
+- **🔒 XSS Protection** - HTML escaping to prevent security vulnerabilities
 
-📅 **5-Day Forecast**
-- Daily high/low temperatures
-- Weather condition and icon
-- Humidity percentage
-- Wind speed
-- Rainfall prediction
+### Data Persistence
+- **💾 Local Storage** - API key, favorites list, and preferences are saved locally
+- **🔐 Secure Storage** - API key never leaves your browser or device
 
-🔍 **Smart City Search**
-- Autocomplete suggestions as you type
-- Search across 195 countries
-- Click suggestions to instantly load weather
-- Geolocation-based weather on startup
+## 🚀 Getting Started
 
-🎨 **Modern UI/UX**
-- Beautiful gradient background
-- Responsive design (mobile, tablet, desktop)
-- Smooth animations and hover effects
-- Glass-morphism effect on cards
-- Weather emoji icons for quick visual reference
+### Prerequisites
+- A free OMDB API key from [https://www.omdbapi.com/apikey.aspx](https://www.omdbapi.com/apikey.aspx)
+- A modern web browser
 
-## Getting Started
+### Setup Instructions
 
-### 1. Get Your API Key
+1. **Get Your API Key**
+   - Visit [https://www.omdbapi.com/apikey.aspx](https://www.omdbapi.com/apikey.aspx)
+   - Sign up for a free account
+   - Copy your API key from the dashboard
 
-1. Visit [OpenWeatherMap API](https://openweathermap.org/api)
-2. Sign up for a **free account**
-3. Go to the **API keys** section in your account dashboard
-4. Copy your API key
+2. **Run the App**
+   - Open `index.html` in your web browser
+   - The app will prompt you to enter your OMDB API key
+   - Paste your API key and click "Save API Key"
 
-### 2. Run the Application
+3. **Start Searching**
+   - Enter a movie title in the search bar
+   - Press Enter or click the Search button
+   - Browse results and click any movie to see details
+   - Add movies to your favorites list
 
-#### Option A: Using Python (Recommended)
-```bash
-cd /path/to/weather-dashboard
-python3 -m http.server 8000
+## 📖 How to Use
+
+### Searching for Movies
+1. Type a movie title in the search bar (e.g., "Inception", "The Matrix")
+2. Use the filter dropdowns to narrow by type or year
+3. Press Enter or click "Search"
+4. Browse the movie cards with posters and ratings
+
+### Managing Favorites
+- **Add to Favorites**: Click the heart icon (🤍/❤️) on any movie card
+- **View Favorites**: See all favorites in the left sidebar
+- **Remove Favorite**: Click the × button next to a favorite, or click the heart again
+- **Quick Search**: Click any favorite in the sidebar to search for it
+- **Clear All**: Use the "Clear All" button to remove all favorites at once
+
+### Viewing Movie Details
+1. Click any movie card to open the detail modal
+2. View comprehensive information including:
+   - High-quality poster image
+   - IMDb rating with star visualization
+   - Release year, runtime, and genre
+   - Full plot description
+   - Director, cast, and writers
+   - Awards information
+   - IMDb vote count and language
+3. Add/remove from favorites directly from the modal
+4. Close the modal by clicking the × button or clicking outside
+
+## 🛠️ Technology Stack
+
+- **HTML5** - Semantic markup structure
+- **CSS3** - Modern styling with CSS Grid, Flexbox, and animations
+- **Vanilla JavaScript** - No frameworks, pure ES6+ code
+- **OMDB API** - Movie data and information
+- **LocalStorage API** - Client-side data persistence
+
+## 📁 Project Structure
+
 ```
-
-Then open your browser and navigate to:
-```
-http://localhost:8000
-```
-
-#### Option B: Using Node.js http-server
-```bash
-npm install -g http-server
-cd /path/to/weather-dashboard
-http-server
-```
-
-#### Option C: Using Live Server (VS Code Extension)
-- Install the "Live Server" extension
-- Right-click on `index.html`
-- Select "Open with Live Server"
-
-### 3. Enter Your API Key
-
-On first load, the application will prompt you to enter your OpenWeatherMap API key. Enter the key you obtained in step 1.
-
-**Note**: Your API key is stored in browser localStorage and never sent to any server except OpenWeatherMap.
-
-## File Structure
-
-```
-weather-dashboard/
-├── index.html          # Main HTML structure
-├── styles.css          # All styling and responsive design
-├── app.js              # JavaScript logic and API integration
+├── index.html          # Main HTML file with semantic structure
+├── styles.css          # Complete CSS with responsive design
+├── app.js              # JavaScript application logic
 └── README.md           # This file
 ```
 
-## How to Use
+## 🎨 Design Highlights
 
-### Search for a City
-1. Type a city name in the search bar
-2. Select from the autocomplete suggestions
-3. Or click "Search" to find the city
-4. Weather data loads instantly
+- **Color Scheme**
+  - Primary: #FF6B6B (Coral Red)
+  - Secondary: #4ECDC4 (Teal)
+  - Accent: #FFD93D (Golden Yellow)
+  - Dark Background: #1A1A2E & #16213E
 
-### View Details
-- **Current Weather**: Large temperature display with weather icon
-- **Weather Details**: Scroll or swipe to see humidity, wind, pressure, etc.
-- **Forecast**: Swipe horizontally or scroll to view 5-day predictions
+- **Responsive Breakpoints**
+  - Desktop: Full layout with sidebar
+  - Tablet (1024px): Adjusted grid
+  - Mobile (768px): Single column layout
+  - Small Phone (480px): Optimized for small screens
 
-### On First Load
-- If geolocation is enabled, weather for your current location is shown
-- If geolocation is disabled, London's weather is shown by default
-- Click on any forecast day to see more details
+## 🔒 Security Features
 
-## API Information
+- **XSS Prevention** - All user input and API data is HTML-escaped
+- **Secure Storage** - API key stored in browser localStorage only
+- **No Backend Required** - Direct API calls from browser (safe for public keys)
+- **Error Handling** - Graceful error messages for failed requests
 
-### Free Tier Limits
-- **Calls per minute**: 60
-- **Data refresh**: Updated every 10 minutes
-- **Forecast**: 5-day ahead forecast (3-hour intervals)
-- **Locations**: All locations worldwide
+## 📊 API Integration
 
-### API Endpoints Used
-1. **Geocoding API**: Convert city names to coordinates
-   - `/geo/1.0/direct` - Get coordinates from city name
+The app uses the free tier of OMDB API with the following endpoints:
 
-2. **Weather API**: Get weather data
-   - `/data/2.5/forecast` - Get 5-day forecast with hourly data
+- **Search**: `/` - Search for movies by title
+  - Parameters: `s` (search query), `type` (optional), `y` (year, optional), `page`
+  
+- **Details**: `/` - Get full movie information
+  - Parameters: `i` (IMDb ID), `plot=full`
 
-## Browser Support
+Free tier limitations:
+- 1,000 API calls per day
+- No movie images for free keys (older API limitation)
+- Results limited to 10 movies per page
 
-- ✅ Chrome (latest)
-- ✅ Firefox (latest)
-- ✅ Safari (latest)
-- ✅ Edge (latest)
-- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
+## 🎯 Features in Detail
 
-## Troubleshooting
+### Movie Cards
+- Responsive grid layout (auto-fills based on screen size)
+- Movie poster with fallback emoji
+- Title with truncation on overflow
+- Release year and IMDb rating
+- Movie type badge (Movie/Series)
+- Favorite heart button with animation
 
-### "Invalid API key" error
-- Ensure you copied the API key correctly from OpenWeatherMap
-- Check that your account is active
-- Wait a few minutes if you just created the account (activation delay)
+### Favorites Sidebar
+- Sticky positioning on desktop
+- Scrollable list of saved favorites
+- Quick search by clicking favorites
+- Individual remove buttons
+- Clear all functionality
+- Empty state message
 
-### "City not found" error
-- Check spelling of the city name
-- Try using a larger city nearby
-- Include country code if needed (e.g., "London, UK")
+### Search & Filters
+- Real-time input handling
+- Type filter (All/Movie/Series)
+- Year filter (Any/2024/2023/2022/2021/2020)
+- Separate control for each filter
+- Clear feedback on empty states
 
-### Geolocation not working
-- Check browser permissions for location access
-- The app falls back to London if geolocation is denied
-- Allow access when your browser asks for location permission
+### Pagination
+- Previous/Next navigation buttons
+- Current page indicator
+- Disabled buttons on boundaries
+- Smooth page transitions
+- Auto-scroll to top
 
-### API rate limit exceeded
-- Free tier allows 60 calls/minute
-- Wait a few seconds before searching again
-- Consider upgrading to a paid tier for higher limits
+### Detail Modal
+- Large readable layout
+- Poster image or emoji placeholder
+- IMDb star rating visualization
+- Metadata in organized grid
+- Full plot description
+- Additional info sections
+- Add to favorites button with state
+- Close button and backdrop click to dismiss
 
-## Weather Icons Guide
+## 🌐 Browser Compatibility
 
-- ☀️ Clear sky day
-- 🌙 Clear sky night
-- ⛅ Few clouds
-- ☁️ Overcast clouds
-- 🌧️ Rainy
-- ⛈️ Thunderstorm
-- ❄️ Snow
-- 🌫️ Mist/Fog
+- Chrome/Edge (90+)
+- Firefox (88+)
+- Safari (14+)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
-## Customization
+## 📝 License
 
-### Change Default City
-Edit `app.js` line ~33:
-```javascript
-fetchWeatherByCity('Tokyo'); // Change 'London' to your preferred city
-```
+This project is open source and available under the MIT License.
 
-### Change Temperature Units
-Edit `app.js` line ~120, change `units=metric` to:
-- `units=metric` for Celsius (default)
-- `units=imperial` for Fahrenheit
-- Update conversion factors accordingly
-
-### Modify Gradient Colors
-Edit `styles.css` line ~13:
-```css
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-```
-
-## Performance Tips
-
-- Forecasts are cached in memory for the current session
-- API calls are minimized by batching data
-- UI updates are optimized with CSS animations instead of JavaScript
-- Mobile-optimized with responsive grid layouts
-
-## Security
-
-- 🔒 API key stored locally in browser (localStorage)
-- 🔒 No backend server - all requests go directly to OpenWeatherMap
-- 🔒 No personal data is collected or transmitted
-- 🔒 HTTPS used for all API calls
-
-## Future Enhancements
-
-Possible features to add:
-- [ ] Hourly forecast details
-- [ ] Air quality index (AQI)
-- [ ] UV index information
-- [ ] Historical weather data
-- [ ] Weather alerts
-- [ ] Multiple city comparison
-- [ ] Favorite cities list
-- [ ] Dark mode toggle
-- [ ] Unit conversion (°C / °F)
-- [ ] Share weather data feature
-
-## License
-
-This project is open source and available for personal and commercial use.
-
-## Credits
-
-- Weather data provided by [OpenWeatherMap](https://openweathermap.org/)
-- Icons: Weather emojis from system font
-- Built with vanilla JavaScript, HTML5, and CSS3
-
-## Support
+## 🙋 Support
 
 For issues or questions:
-1. Check the troubleshooting section above
-2. Visit [OpenWeatherMap FAQ](https://openweathermap.org/faq)
-3. Review your API key settings at [openweathermap.org](https://openweathermap.org)
+1. Check your OMDB API key is valid
+2. Verify you haven't exceeded the daily API limit
+3. Clear browser cache if experiencing issues
+4. Check browser console (F12) for error messages
+
+## 🎓 Learning Resources
+
+- [OMDB API Documentation](http://www.omdbapi.com/)
+- [MDN Web Docs - Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+- [MDN Web Docs - LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+- [CSS Grid Guide](https://css-tricks.com/snippets/css/complete-guide-grid/)
 
 ---
 
-**Happy weather tracking! 🌦️**
+**Enjoy discovering and managing your favorite movies! 🍿🎬**
