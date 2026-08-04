@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meme Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #22263a;
+      --border:    #2e3352;
+      --accent:    #6c63ff;
+      --accent2:   #ff6584;
+      --text:      #e8eaf6;
+      --subtext:   #8b8fa8;
+      --radius:    14px;
+      --shadow:    0 8px 32px rgba(0,0,0,.45);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 60px;
+    }
+
+    /* ── Header ──────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+    header p {
+      color: var(--subtext);
+      margin-top: 6px;
+      font-size: .95rem;
+    }
+
+    /* ── Main layout ─────────────────────────────────── */
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 1100px;
+      align-items: start;
+    }
+
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Panels ──────────────────────────────────────── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel-title {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    /* ── Source tabs ─────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--subtext);
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Upload zone ─────────────────────────────────── */
+    #upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 32px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    #upload-zone:hover, #upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(108,99,255,.07);
+    }
+    #upload-zone svg { opacity: .45; margin-bottom: 10px; }
+    #upload-zone p  { color: var(--subtext); font-size: .88rem; line-height: 1.5; }
+    #upload-zone span { color: var(--accent); font-weight: 600; }
+    #file-input { display: none; }
+
+    /* ── Template grid ───────────────────────────────── */
+    #template-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .tpl-card {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color .2s, transform .15s;
+      aspect-ratio: 1;
+      background: var(--surface2);
+    }
+    .tpl-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
+    .tpl-card:hover   { transform: scale(1.04); border-color: var(--accent); }
+    .tpl-card.active  { border-color: var(--accent2); }
+
+    /* ── Text controls ───────────────────────────────── */
+    .text-section {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .text-section h3 {
+      font-size: .8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--subtext);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .text-section h3 span {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: .75rem;
+    }
+
+    label {
+      display: block;
+      font-size: .8rem;
+      color: var(--subtext);
+      margin-bottom: 5px;
+      margin-top: 10px;
+    }
+    label:first-of-type { margin-top: 0; }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input[type="text"]:focus,
+    select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    .row { display: flex; gap: 10px; }
+    .row > * { flex: 1; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 99px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .range-row input[type="range"] { flex: 1; }
+    .range-val {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 34px;
+      text-align: right;
+    }
+
+    input[type="color"] {
+      -webkit-appearance: none;
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      padding: 2px;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 5px; }
+    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 5px; }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .color-row label { margin: 0; flex: 1; }
+
+    /* stroke toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .toggle-label { font-size: .82rem; color: var(--subtext); }
+    .toggle {
+      position: relative;
+      width: 38px; height: 22px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider-toggle {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .slider-toggle::before {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      left: 3px; top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform .2s;
+    }
+    .toggle input:checked + .slider-toggle { background: var(--accent); }
+    .toggle input:checked + .slider-toggle::before { transform: translateX(16px); }
+
+    /* ── Canvas area ─────────────────────────────────── */
+    .canvas-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+
+    #meme-canvas {
+      border-radius: 10px;
+      max-width: 100%;
+      background: #111;
+      box-shadow: 0 4px 24px rgba(0,0,0,.6);
+      display: block;
+    }
+
+    /* empty state */
+    #canvas-placeholder {
+      width: 100%;
+      min-height: 340px;
+      border-radius: 10px;
+      border: 2px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: var(--subtext);
+    }
+    #canvas-placeholder svg { opacity: .3; }
+    #canvas-placeholder p { font-size: .9rem; }
+    #meme-canvas.hidden { display: none; }
+
+    /* ── Buttons ─────────────────────────────────────── */
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .btn {
+      padding: 11px 24px;
+      border-radius: 9px;
+      border: none;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #9b8cff);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(108,99,255,.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108,99,255,.55);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #43c6ac, #2fb87d);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(67,198,172,.35);
+    }
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(67,198,172,.5);
+    }
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--subtext);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--border); color: var(--text); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; }
+
+    /* ── Toast ───────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 11px 22px;
+      border-radius: 99px;
+      font-size: .88rem;
+      box-shadow: var(--shadow);
+      transition: transform .3s ease;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: #43c6ac; color: #43c6ac; }
+    .toast.error   { border-color: var(--accent2); color: var(--accent2); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎭 Meme Generator</h1>
+    <p>Upload an image or pick a template · customize text · download your meme</p>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Left controls panel ── -->
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- Image source -->
+      <div class="panel">
+        <p class="panel-title">📁 Image Source</p>
+
+        <div class="tabs">
+          <button class="tab-btn active" id="tab-upload" onclick="switchTab('upload')">Upload</button>
+          <button class="tab-btn"        id="tab-tpl"    onclick="switchTab('templates')">Templates</button>
+        </div>
+
+        <!-- Upload -->
+        <div id="pane-upload">
+          <div id="upload-zone" onclick="document.getElementById('file-input').click()"
+               ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+            </svg>
+            <p><span>Click to upload</span> or drag & drop<br>PNG, JPG, GIF, WebP</p>
+          </div>
+          <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)" />
+        </div>
+
+        <!-- Templates -->
+        <div id="pane-templates" style="display:none;">
+          <div id="template-grid"></div>
+        </div>
+      </div>
+
+      <!-- Top text -->
+      <div class="panel">
+        <p class="panel-title">✏️ Text Customization</p>
+
+        <div class="text-section">
+          <h3><span>TOP</span> Text</h3>
+          <label>Text</label>
+          <input type="text" id="top-text" placeholder="TOP TEXT" oninput="renderMeme()" />
+
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label>Font</label>
+              <select id="top-font" onchange="renderMeme()">
+                <option value="Impact">Impact</option>
+                <option value="Arial Black">Arial Black</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Tahoma">Tahoma</option>
+              </select>
+            </div>
+          </div>
+
+          <label>Font Size</label>
+          <div class="range-row">
+            <input type="range" id="top-size" min="12" max="120" value="48" oninput="updateRange(this,'top-size-val');renderMeme()" />
+            <span class="range-val" id="top-size-val">48</span>
+          </div>
+
+          <div class="color-row" style="margin-top:10px;">
+            <label>Color</label>
+            <input type="color" id="top-color" value="#ffffff" oninput="renderMeme()" />
+            <label style="margin-left:8px;">Stroke</label>
+            <input type="color" id="top-stroke" value="#000000" oninput="renderMeme()" />
+          </div>
+
+          <div class="toggle-row">
+            <span class="toggle-label">Stroke outline</span>
+            <label class="toggle">
+              <input type="checkbox" id="top-stroke-toggle" checked onchange="renderMeme()" />
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="text-section">
+          <h3><span style="background:var(--accent2);">BOT</span> Text</h3>
+          <label>Text</label>
+          <input type="text" id="bot-text" placeholder="BOTTOM TEXT" oninput="renderMeme()" />
+
+          <div class="row" style="margin-top:10px;">
+            <div>
+              <label>Font</label>
+              <select id="bot-font" onchange="renderMeme()">
+                <option value="Impact">Impact</option>
+                <option value="Arial Black">Arial Black</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Tahoma">Tahoma</option>
+              </select>
+            </div>
+          </div>
+
+          <label>Font Size</label>
+          <div class="range-row">
+            <input type="range" id="bot-size" min="12" max="120" value="48" oninput="updateRange(this,'bot-size-val');renderMeme()" />
+            <span class="range-val" id="bot-size-val">48</span>
+          </div>
+
+          <div class="color-row" style="margin-top:10px;">
+            <label>Color</label>
+            <input type="color" id="bot-color" value="#ffffff" oninput="renderMeme()" />
+            <label style="margin-left:8px;">Stroke</label>
+            <input type="color" id="bot-stroke" value="#000000" oninput="renderMeme()" />
+          </div>
+
+          <div class="toggle-row">
+            <span class="toggle-label">Stroke outline</span>
+            <label class="toggle">
+              <input type="checkbox" id="bot-stroke-toggle" checked onchange="renderMeme()" />
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end left column -->
+
+    <!-- ── Right canvas panel ── -->
+    <div class="canvas-wrap">
+      <p class="panel-title" style="width:100%;margin-bottom:0;">🖼️ Preview</p>
+
+      <div id="canvas-placeholder">
+        <svg width="64" height="64" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5a1.5 1.5 0 001.5-1.5v-15a1.5 1.5 0 00-1.5-1.5H3.75a1.5 1.5 0 00-1.5 1.5v15a1.5 1.5 0 001.5 1.5zM12.75 8.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+        </svg>
+        <p>Select an image or template to get started</p>
+      </div>
+
+      <canvas id="meme-canvas" class="hidden"></canvas>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" id="render-btn" onclick="renderMeme()" disabled>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
+          </svg>
+          Re-render
+        </button>
+        <button class="btn btn-success" id="download-btn" onclick="downloadMeme()" disabled>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+          </svg>
+          Download PNG
+        </button>
+        <button class="btn btn-ghost" onclick="resetAll()">
+          <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+          Reset
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end .layout -->
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /* ─────────────────────────────────────────────
+       State
+    ───────────────────────────────────────────── */
+    let currentImage = null;   // HTMLImageElement currently loaded
+    let activeTab    = 'upload';
+
+    const canvas  = document.getElementById('meme-canvas');
+    const ctx     = canvas.getContext('2d');
+    const placeholder = document.getElementById('canvas-placeholder');
+    const renderBtn   = document.getElementById('render-btn');
+    const downloadBtn = document.getElementById('download-btn');
+
+    /* ─────────────────────────────────────────────
+       Meme templates (SVG data-URIs as placeholders
+       then real famous meme images via picsum/
+       public domain sources)
+    ───────────────────────────────────────────── */
+    const TEMPLATES = [
+      {
+        label: 'Drake',
+        url: 'https://i.imgflip.com/30b1gx.jpg',
+      },
+      {
+        label: 'Distracted BF',
+        url: 'https://i.imgflip.com/1ur9b0.jpg',
+      },
+      {
+        label: 'Two Buttons',
+        url: 'https://i.imgflip.com/1g8my4.jpg',
+      },
+      {
+        label: 'Change My Mind',
+        url: 'https://i.imgflip.com/24y43o.jpg',
+      },
+      {
+        label: 'Woman Yelling',
+        url: 'https://i.imgflip.com/345v97.jpg',
+      },
+      {
+        label: 'Expanding Brain',
+        url: 'https://i.imgflip.com/1jwhww.jpg',
+      },
+      {
+        label: 'Surprised Pikachu',
+        url: 'https://i.imgflip.com/2kbn1e.jpg',
+      },
+      {
+        label: 'This Is Fine',
+        url: 'https://i.imgflip.com/wxica.jpg',
+      },
+      {
+        label: 'Grumpy Cat',
+        url: 'https://i.imgflip.com/8p0a.jpg',
+      },
+    ];
+
+    /* ─────────────────────────────────────────────
+       Init templates grid
+    ───────────────────────────────────────────── */
+    (function buildTemplateGrid() {
+      const grid = document.getElementById('template-grid');
+      TEMPLATES.forEach((tpl, i) => {
+        const card = document.createElement('div');
+        card.className = 'tpl-card';
+        card.title = tpl.label;
+        card.dataset.index = i;
+        card.onclick = () => loadTemplate(i);
+
+        const img = document.createElement('img');
+        img.src = tpl.url;
+        img.alt = tpl.label;
+        img.crossOrigin = 'anonymous';
+        img.onerror = () => { card.style.display = 'none'; };
+
+        card.appendChild(img);
+        grid.appendChild(card);
+      });
+    })();
+
+    /* ─────────────────────────────────────────────
+       Tab switching
+    ───────────────────────────────────────────── */
+    function switchTab(tab) {
+      activeTab = tab;
+      document.getElementById('pane-upload').style.display    = tab === 'upload'    ? '' : 'none';
+      document.getElementById('pane-templates').style.display = tab === 'templates' ? '' : 'none';
+      document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
+      document.getElementById('tab-tpl').classList.toggle('active',    tab === 'templates');
+    }
+
+    /* ─────────────────────────────────────────────
+       File upload
+    ───────────────────────────────────────────── */
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'error'); return; }
+      loadImageFromFile(file);
+    }
+
+    function loadImageFromFile(file) {
+      const reader = new FileReader();
+      reader.onload = ev => loadImageFromURL(ev.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    function loadImageFromURL(url) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload  = () => { currentImage = img; activateCanvas(); renderMeme(); };
+      img.onerror = ()  => showToast('Failed to load image', 'error');
+      img.src = url;
+    }
+
+    /* ─────────────────────────────────────────────
+       Drag & Drop
+    ───────────────────────────────────────────── */
+    function onDragOver(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.add('drag-over');
+    }
+    function onDragLeave() {
+      document.getElementById('upload-zone').classList.remove('drag-over');
+    }
+    function onDrop(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) loadImageFromFile(file);
+      else showToast('Please drop an image file', 'error');
+    }
+
+    /* ─────────────────────────────────────────────
+       Template loader
+    ───────────────────────────────────────────── */
+    function loadTemplate(idx) {
+      // mark active
+      document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.tpl-card[data-index="${idx}"]`).classList.add('active');
+      loadImageFromURL(TEMPLATES[idx].url);
+    }
+
+    /* ─────────────────────────────────────────────
+       Activate canvas (hide placeholder)
+    ───────────────────────────────────────────── */
+    function activateCanvas() {
+      placeholder.style.display = 'none';
+      canvas.classList.remove('hidden');
+      renderBtn.disabled    = false;
+      downloadBtn.disabled  = false;
+    }
+
+    /* ─────────────────────────────────────────────
+       Helpers for controls
+    ───────────────────────────────────────────── */
+    function updateRange(el, displayId) {
+      document.getElementById(displayId).textContent = el.value;
+    }
+
+    function val(id)     { return document.getElementById(id).value; }
+    function checked(id) { return document.getElementById(id).checked; }
+
+    /* ─────────────────────────────────────────────
+       Core render
+    ───────────────────────────────────────────── */
+    function renderMeme() {
+      if (!currentImage) return;
+
+      // Fit canvas to image (max 900px wide)
+      const MAX_W = 900;
+      let w = currentImage.naturalWidth  || currentImage.width;
+      let h = currentImage.naturalHeight || currentImage.height;
+      if (w > MAX_W) { h = Math.round(h * MAX_W / w); w = MAX_W; }
+
+      canvas.width  = w;
+      canvas.height = h;
+
+      // Draw base image
+      ctx.drawImage(currentImage, 0, 0, w, h);
+
+      // Draw texts
+      drawText({
+        text:        val('top-text'),
+        font:        val('top-font'),
+        size:        parseInt(val('top-size')),
+        color:       val('top-color'),
+        strokeColor: val('top-stroke'),
+        useStroke:   checked('top-stroke-toggle'),
+        position:    'top',
+        canvasW: w, canvasH: h,
+      });
+
+      drawText({
+        text:        val('bot-text'),
+        font:        val('bot-font'),
+        size:        parseInt(val('bot-size')),
+        color:       val('bot-color'),
+        strokeColor: val('bot-stroke'),
+        useStroke:   checked('bot-stroke-toggle'),
+        position:    'bottom',
+        canvasW: w, canvasH: h,
+      });
+    }
+
+    /* ─────────────────────────────────────────────
+       Text drawing with word-wrap
+    ───────────────────────────────────────────── */
+    function drawText({ text, font, size, color, strokeColor, useStroke, position, canvasW, canvasH }) {
+      if (!text.trim()) return;
+
+      ctx.save();
+
+      ctx.font         = `900 ${size}px "${font}", Impact, sans-serif`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = position === 'top' ? 'top' : 'alphabetic';
+
+      const maxWidth   = canvasW * 0.9;
+      const lineHeight = size * 1.18;
+      const padding    = size * 0.45;
+      const strokeW    = Math.max(2, size * 0.07);
+
+      // Word-wrap
+      const lines = wrapText(ctx, text.toUpperCase(), maxWidth);
+
+      const x = canvasW / 2;
+      let y;
+      if (position === 'top') {
+        y = padding;
+      } else {
+        // bottom: position so last line sits near bottom
+        y = canvasH - padding - (lines.length - 1) * lineHeight;
+      }
+
+      lines.forEach((line, i) => {
+        const ly = y + i * lineHeight;
+        if (useStroke) {
+          ctx.lineWidth   = strokeW * 2;
+          ctx.strokeStyle = strokeColor;
+          ctx.lineJoin    = 'round';
+          ctx.strokeText(line, x, ly);
+        }
+        ctx.fillStyle = color;
+        ctx.fillText(line, x, ly);
+      });
+
+      ctx.restore();
+    }
+
+    function wrapText(ctx, text, maxWidth) {
+      const words = text.split(' ');
+      const lines  = [];
+      let current  = '';
+
+      for (const word of words) {
+        const test = current ? current + ' ' + word : word;
+        if (ctx.measureText(test).width <= maxWidth) {
+          current = test;
+        } else {
+          if (current) lines.push(current);
+          // If a single word is too wide, let it overflow gracefully
+          current = word;
+        }
+      }
+      if (current) lines.push(current);
+      return lines;
+    }
+
+    /* ─────────────────────────────────────────────
+       Download
+    ───────────────────────────────────────────── */
+    function downloadMeme() {
+      if (!currentImage) return;
+      renderMeme(); // ensure fresh render
+
+      const link = document.createElement('a');
+      link.download = 'meme.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('Meme downloaded! 🎉', 'success');
+    }
+
+    /* ─────────────────────────────────────────────
+       Reset
+    ───────────────────────────────────────────── */
+    function resetAll() {
+      currentImage = null;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.classList.add('hidden');
+      placeholder.style.display = '';
+      renderBtn.disabled   = true;
+      downloadBtn.disabled = true;
+
+      document.getElementById('top-text').value = '';
+      document.getElementById('bot-text').value = '';
+      document.getElementById('top-size').value = 48;
+      document.getElementById('bot-size').value = 48;
+      document.getElementById('top-size-val').textContent = '48';
+      document.getElementById('bot-size-val').textContent = '48';
+      document.getElementById('top-color').value  = '#ffffff';
+      document.getElementById('bot-color').value  = '#ffffff';
+      document.getElementById('top-stroke').value = '#000000';
+      document.getElementById('bot-stroke').value = '#000000';
+      document.getElementById('top-stroke-toggle').checked = true;
+      document.getElementById('bot-stroke-toggle').checked = true;
+      document.getElementById('file-input').value = '';
+
+      document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
+      showToast('Reset complete');
+    }
+
+    /* ─────────────────────────────────────────────
+       Toast
+    ───────────────────────────────────────────── */
+    let toastTimer;
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className   = 'toast' + (type ? ' ' + type : '');
+      void t.offsetWidth; // reflow
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    /* ─────────────────────────────────────────────
+       Keyboard shortcut: Ctrl/Cmd + S → download
+    ───────────────────────────────────────────── */
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!downloadBtn.disabled) downloadMeme();
+      }
+    });
+  </script>
+</body>
+</html>
