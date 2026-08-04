@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz App</title>
+  <style>
+    /* ── Reset & Variables ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0f0c29;
+      --card:        #1e1b4b;
+      --card-alt:    #252060;
+      --accent:      #7c3aed;
+      --accent-2:    #a855f7;
+      --success:     #22c55e;
+      --danger:      #ef4444;
+      --warning:     #f59e0b;
+      --text:        #f1f5f9;
+      --muted:       #94a3b8;
+      --radius:      16px;
+      --shadow:      0 8px 32px rgba(0,0,0,.45);
+      --timer-full:  #22c55e;
+      --timer-warn:  #f59e0b;
+      --timer-crit:  #ef4444;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: var(--text);
+      padding: 20px;
+    }
+
+    /* ── Shared Card ────────────────────────────────────────────── */
+    .screen {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      padding: 2px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Screen Visibility ──────────────────────────────────────── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Screen Transitions ─────────────────────────────────────── */
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(60px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOutLeft {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-60px); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      0%   { transform: scale(.8); opacity: 0; }
+      70%  { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.12); }
+    }
+
+    .slide-in  { animation: slideInRight .38s cubic-bezier(.22,.68,0,1.2) both; }
+    .slide-out { animation: slideOutLeft .3s ease-in both; }
+    .fade-in   { animation: fadeIn .4s ease both; }
+
+    /* ── Start Screen ───────────────────────────────────────────── */
+    #start-screen { text-align: center; }
+    .quiz-logo {
+      font-size: 52px;
+      margin-bottom: 12px;
+      animation: popIn .5s ease both;
+    }
+    #start-screen h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #f0abfc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    #start-screen p {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .meta-pills {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .pill {
+      background: rgba(124,58,237,.2);
+      border: 1px solid rgba(124,58,237,.4);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: .85rem;
+      color: #c4b5fd;
+    }
+
+    /* ── Buttons ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 14px 32px;
+      transition: transform .15s, box-shadow .15s, filter .15s;
+      letter-spacing: .02em;
+    }
+    .btn:hover  { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn:active { transform: translateY(0);    filter: brightness(.95); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(124,58,237,.5);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--accent-2);
+      border: 2px solid var(--accent-2);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(34,197,94,.4);
+    }
+
+    /* ── Quiz Header ────────────────────────────────────────────── */
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 12px;
+    }
+    .progress-info { font-size: .9rem; color: var(--muted); }
+    .progress-info strong { color: var(--text); font-size: 1rem; }
+
+    /* Score badge */
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34,197,94,.15);
+      border: 1px solid rgba(34,197,94,.35);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: .9rem;
+      color: #86efac;
+      font-weight: 600;
+    }
+
+    /* Timer */
+    .timer-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .timer-ring {
+      position: relative;
+      width: 54px;
+      height: 54px;
+    }
+    .timer-ring svg { transform: rotate(-90deg); }
+    .timer-ring circle { transition: stroke-dashoffset .9s linear, stroke .3s; }
+    .timer-number {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .timer-number.pulse { animation: timerPulse .5s ease infinite; }
+
+    /* Progress bar */
+    .progress-bar-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,.1);
+      border-radius: 999px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 999px;
+      transition: width .4s cubic-bezier(.22,.68,0,1.2);
+    }
+
+    /* ── Question Card ──────────────────────────────────────────── */
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 28px;
+      min-height: 60px;
+    }
+    .category-tag {
+      display: inline-block;
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #c4b5fd;
+      background: rgba(124,58,237,.2);
+      border-radius: 6px;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+    }
+
+    /* ── Options ────────────────────────────────────────────────── */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 480px) {
+      .options-grid { grid-template-columns: 1fr; }
+      .screen { padding: 28px 22px; }
+      #start-screen h1 { font-size: 1.7rem; }
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-alt);
+      border: 2px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: .97rem;
+      font-weight: 500;
+      padding: 14px 18px;
+      text-align: left;
+      transition: border-color .2s, background .2s, transform .15s;
+      line-height: 1.4;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent-2);
+      background: rgba(124,58,237,.15);
+      transform: translateY(-2px);
+    }
+    .option-letter {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .85rem;
+      transition: background .2s;
+    }
+
+    /* Answer feedback states */
+    .option-btn.correct {
+      border-color: var(--success);
+      background: rgba(34,197,94,.15);
+    }
+    .option-btn.correct .option-letter {
+      background: var(--success);
+      color: #fff;
+    }
+    .option-btn.wrong {
+      border-color: var(--danger);
+      background: rgba(239,68,68,.15);
+    }
+    .option-btn.wrong .option-letter {
+      background: var(--danger);
+      color: #fff;
+    }
+    .option-btn:disabled { cursor: default; transform: none !important; }
+
+    /* Feedback bar */
+    .feedback-bar {
+      margin-top: 18px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      transition: opacity .3s;
+    }
+    .feedback-bar.hidden { opacity: 0; pointer-events: none; }
+    .feedback-bar.correct { background: rgba(34,197,94,.18); color: #86efac; border: 1px solid rgba(34,197,94,.3); }
+    .feedback-bar.wrong   { background: rgba(239,68,68,.18);  color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+
+    /* ── Results Screen ─────────────────────────────────────────── */
+    #results-screen { text-align: center; }
+    .results-emoji {
+      font-size: 64px;
+      margin-bottom: 10px;
+      animation: popIn .5s .1s ease both;
+    }
+    #results-screen h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #a78bfa, #f0abfc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .results-subtitle { color: var(--muted); margin-bottom: 28px; font-size: 1rem; }
+
+    /* Score ring */
+    .score-ring-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 28px;
+      animation: popIn .5s .2s ease both;
+    }
+    .score-ring-wrap svg { transform: rotate(-90deg); }
+    .score-ring-wrap circle { transition: stroke-dashoffset 1.2s cubic-bezier(.22,.68,0,1.2); }
+    .score-ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .score-ring-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .score-ring-label { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 400px) { .stats-grid { grid-template-columns: 1fr; } }
+    .stat-card {
+      background: var(--card-alt);
+      border-radius: 12px;
+      padding: 16px 12px;
+      animation: fadeIn .4s ease both;
+    }
+    .stat-card:nth-child(1) { animation-delay: .15s; }
+    .stat-card:nth-child(2) { animation-delay: .25s; }
+    .stat-card:nth-child(3) { animation-delay: .35s; }
+    .stat-value { font-size: 1.7rem; font-weight: 800; }
+    .stat-label { font-size: .78rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .06em; }
+    .stat-correct { color: var(--success); }
+    .stat-wrong   { color: var(--danger); }
+    .stat-time    { color: var(--warning); }
+
+    /* Summary list */
+    .summary-toggle {
+      background: none;
+      border: none;
+      color: var(--accent-2);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .summary-list { text-align: left; margin-bottom: 24px; display: none; }
+    .summary-list.open { display: block; }
+    .summary-item {
+      background: var(--card-alt);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      border-left: 4px solid transparent;
+      animation: fadeIn .3s ease both;
+    }
+    .summary-item.correct-item { border-left-color: var(--success); }
+    .summary-item.wrong-item   { border-left-color: var(--danger); }
+    .summary-q   { font-size: .9rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    .summary-ans { font-size: .83rem; color: var(--muted); display: flex; flex-direction: column; gap: 2px; }
+    .summary-ans .your  { color: #fca5a5; }
+    .summary-ans .right { color: #86efac; }
+
+    .results-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     START SCREEN
+══════════════════════════════════════════════════════════════════ -->
+<div id="start-screen" class="screen active fade-in">
+  <div class="quiz-logo">🧠</div>
+  <h1>Ultimate Quiz</h1>
+  <p>Test your knowledge across multiple categories.<br>Answer carefully — the clock is ticking!</p>
+  <div class="meta-pills">
+    <span class="pill">📋 10 Questions</span>
+    <span class="pill">⏱ 20 sec / question</span>
+    <span class="pill">🏆 Score tracking</span>
+  </div>
+  <button class="btn btn-primary" id="start-btn">
+    ▶ &nbsp;Start Quiz
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     QUIZ SCREEN
+══════════════════════════════════════════════════════════════════ -->
+<div id="quiz-screen" class="screen">
+
+  <!-- Header row -->
+  <div class="quiz-header">
+    <div class="progress-info">
+      Question <strong id="q-current">1</strong> of <strong id="q-total">10</strong>
+    </div>
+
+    <!-- Circular timer -->
+    <div class="timer-wrap">
+      <div class="timer-ring" id="timer-ring">
+        <svg width="54" height="54" viewBox="0 0 54 54">
+          <circle cx="27" cy="27" r="23" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="5"/>
+          <circle id="timer-arc" cx="27" cy="27" r="23" fill="none"
+                  stroke="#22c55e" stroke-width="5"
+                  stroke-linecap="round"
+                  stroke-dasharray="144.51"
+                  stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-number" id="timer-num">20</div>
+      </div>
+    </div>
+
+    <!-- Live score -->
+    <div class="score-badge">
+      ⭐ <span id="live-score">0</span>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-bar-track">
+    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <!-- Question -->
+  <div class="category-tag" id="q-category">General</div>
+  <div class="question-text" id="q-text">Loading…</div>
+
+  <!-- Options -->
+  <div class="options-grid" id="options-grid"></div>
+
+  <!-- Feedback -->
+  <div class="feedback-bar hidden" id="feedback-bar"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     RESULTS SCREEN
+══════════════════════════════════════════════════════════════════ -->
+<div id="results-screen" class="screen">
+  <div class="results-emoji" id="results-emoji">🎉</div>
+  <h2 id="results-title">Great Job!</h2>
+  <p class="results-subtitle" id="results-subtitle">Here's how you did:</p>
+
+  <!-- Big score ring -->
+  <div class="score-ring-wrap">
+    <svg width="140" height="140" viewBox="0 0 140 140">
+      <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="10"/>
+      <circle id="result-arc" cx="70" cy="70" r="58" fill="none"
+              stroke="url(#grad)" stroke-width="10"
+              stroke-linecap="round"
+              stroke-dasharray="364.42"
+              stroke-dashoffset="364.42"/>
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#7c3aed"/>
+          <stop offset="100%" stop-color="#a855f7"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="score-ring-center">
+      <span class="score-ring-number" id="final-score-pct">0%</span>
+      <span class="score-ring-label">Score</span>
+    </div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value stat-correct" id="stat-correct">0</div>
+      <div class="stat-label">✅ Correct</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value stat-wrong" id="stat-wrong">0</div>
+      <div class="stat-label">❌ Wrong</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value stat-time" id="stat-time">0s</div>
+      <div class="stat-label">⏱ Avg Time</div>
+    </div>
+  </div>
+
+  <!-- Toggle detailed summary -->
+  <button class="summary-toggle" id="summary-toggle">
+    <span id="toggle-icon">▼</span> View Question Summary
+  </button>
+  <div class="summary-list" id="summary-list"></div>
+
+  <!-- Actions -->
+  <div class="results-actions">
+    <button class="btn btn-primary" id="restart-btn">🔄 &nbsp;Play Again</button>
+    <button class="btn btn-outline" id="review-btn">📋 &nbsp;Review Answers</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════════════ -->
+<script>
+/* ─── Question Bank ───────────────────────────────────────────── */
+const QUESTIONS = [
+  {
+    category: "Science",
+    question: "What is the chemical symbol for Gold?",
+    options: ["Ag", "Au", "Gd", "Go"],
+    answer: 1
+  },
+  {
+    category: "Geography",
+    question: "Which country has the largest land area in the world?",
+    options: ["China", "Canada", "Russia", "USA"],
+    answer: 2
+  },
+  {
+    category: "Technology",
+    question: "What does 'HTTP' stand for?",
+    options: [
+      "HyperText Transfer Protocol",
+      "High Transfer Text Protocol",
+      "Hyper Transfer Text Process",
+      "HyperText Transmission Program"
+    ],
+    answer: 0
+  },
+  {
+    category: "History",
+    question: "In which year did World War II end?",
+    options: ["1943", "1944", "1945", "1946"],
+    answer: 2
+  },
+  {
+    category: "Science",
+    question: "How many bones are in the adult human body?",
+    options: ["196", "206", "216", "226"],
+    answer: 1
+  },
+  {
+    category: "Pop Culture",
+    question: "Which movie features the quote: 'To infinity and beyond!'?",
+    options: ["Shrek", "The Lion King", "Toy Story", "Finding Nemo"],
+    answer: 2
+  },
+  {
+    category: "Mathematics",
+    question: "What is the value of π (pi) to two decimal places?",
+    options: ["3.12", "3.14", "3.16", "3.18"],
+    answer: 1
+  },
+  {
+    category: "Geography",
+    question: "What is the capital city of Australia?",
+    options: ["Sydney", "Melbourne", "Brisbane", "Canberra"],
+    answer: 3
+  },
+  {
+    category: "Technology",
+    question: "Who co-founded Apple Inc. alongside Steve Jobs?",
+    options: ["Bill Gates", "Steve Wozniak", "Elon Musk", "Mark Zuckerberg"],
+    answer: 1
+  },
+  {
+    category: "Science",
+    question: "Which planet is known as the Red Planet?",
+    options: ["Venus", "Saturn", "Mars", "Jupiter"],
+    answer: 2
+  }
+];
+
+const TIME_PER_Q   = 20;           // seconds per question
+const CIRCUMFERENCE = 2 * Math.PI * 23;  // timer ring circumference
+
+/* ─── State ───────────────────────────────────────────────────── */
+let state = {};
+
+function initState() {
+  state = {
+    index:       0,
+    score:       0,
+    answered:    false,
+    timerVal:    TIME_PER_Q,
+    timerID:     null,
+    results:     [],       // { correct, yourAnswer, timeTaken }
+    startTime:   null,
+  };
+}
+
+/* ─── DOM refs ────────────────────────────────────────────────── */
+const screens    = { start: $('start-screen'), quiz: $('quiz-screen'), results: $('results-screen') };
+const qCurrent   = $('q-current');
+const qTotal     = $('q-total');
+const qCategory  = $('q-category');
+const qText      = $('q-text');
+const optionsGrid= $('options-grid');
+const feedbackBar= $('feedback-bar');
+const liveScore  = $('live-score');
+const progressFill=$('progress-fill');
+const timerNum   = $('timer-num');
+const timerArc   = $('timer-arc');
+
+function $(id) { return document.getElementById(id); }
+
+/* ─── Screen Manager ──────────────────────────────────────────── */
+function showScreen(name, animClass = 'fade-in') {
+  Object.values(screens).forEach(s => { s.classList.remove('active', 'slide-in', 'slide-out', 'fade-in'); });
+  const target = screens[name];
+  target.classList.add('active', animClass);
+}
+
+/* ─── Start Quiz ──────────────────────────────────────────────── */
+$('start-btn').addEventListener('click', () => {
+  initState();
+  qTotal.textContent = QUESTIONS.length;
+  showScreen('quiz', 'slide-in');
+  loadQuestion();
+});
+
+/* ─── Load Question ───────────────────────────────────────────── */
+function loadQuestion() {
+  const q = QUESTIONS[state.index];
+  state.answered = false;
+  state.startTime = Date.now();
+
+  // Update header
+  qCurrent.textContent  = state.index + 1;
+  liveScore.textContent = state.score;
+
+  // Progress bar
+  progressFill.style.width = ((state.index / QUESTIONS.length) * 100) + '%';
+
+  // Question text & category
+  qCategory.textContent = q.category;
+  qText.textContent     = q.question;
+
+  // Hide feedback
+  feedbackBar.className = 'feedback-bar hidden';
+  feedbackBar.textContent = '';
+
+  // Build options
+  optionsGrid.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.style.animationDelay = (i * 0.07) + 's';
+    btn.classList.add('slide-in');
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span> ${escHtml(opt)}`;
+    btn.addEventListener('click', () => selectOption(i));
+    optionsGrid.appendChild(btn);
+  });
+
+  // Start timer
+  resetTimer();
+  startTimer();
+}
+
+/* ─── Timer ───────────────────────────────────────────────────── */
+function resetTimer() {
+  clearInterval(state.timerID);
+  state.timerVal = TIME_PER_Q;
+  updateTimerUI(TIME_PER_Q);
+}
+
+function startTimer() {
+  state.timerID = setInterval(() => {
+    state.timerVal--;
+    updateTimerUI(state.timerVal);
+    if (state.timerVal <= 0) {
+      clearInterval(state.timerID);
+      timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI(val) {
+  timerNum.textContent = val;
+
+  // Stroke colour
+  const pct = val / TIME_PER_Q;
+  let colour;
+  if (pct > 0.5)      colour = getComputedStyle(document.documentElement).getPropertyValue('--timer-full').trim();
+  else if (pct > 0.25) colour = getComputedStyle(document.documentElement).getPropertyValue('--timer-warn').trim();
+  else                 colour = getComputedStyle(document.documentElement).getPropertyValue('--timer-crit').trim();
+
+  timerArc.style.stroke = colour;
+  timerArc.style.strokeDashoffset = CIRCUMFERENCE * (1 - pct);
+
+  // Pulse when critical
+  if (val <= 5) timerNum.classList.add('pulse');
+  else          timerNum.classList.remove('pulse');
+}
+
+function timeOut() {
+  if (state.answered) return;
+  state.answered = true;
+  const timeTaken = TIME_PER_Q;
+
+  // Reveal correct answer
+  revealAnswer(-1, QUESTIONS[state.index].answer, timeTaken);
+  showFeedback(false, '⏰ Time\'s up! The correct answer is highlighted.');
+  state.results.push({ correct: false, yourAnswer: -1, timeTaken });
+
+  scheduleNext();
+}
+
+/* ─── Select Option ───────────────────────────────────────────── */
+function selectOption(idx) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timerID);
+
+  const timeTaken = Math.round((Date.now() - state.startTime) / 1000);
+  const correct   = idx === QUESTIONS[state.index].answer;
+
+  if (correct) state.score++;
+
+  revealAnswer(idx, QUESTIONS[state.index].answer, timeTaken);
+  showFeedback(correct, correct ? '🎉 Correct! Well done!' : `❌ Wrong! The correct answer is "${QUESTIONS[state.index].options[QUESTIONS[state.index].answer]}"`);
+  liveScore.textContent = state.score;
+
+  state.results.push({ correct, yourAnswer: idx, timeTaken });
+  scheduleNext();
+}
+
+function revealAnswer(selected, correct, _time) {
+  const btns = optionsGrid.querySelectorAll('.option-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === correct)  btn.classList.add('correct');
+    if (i === selected && selected !== correct) btn.classList.add('wrong');
+  });
+}
+
+function showFeedback(isCorrect, msg) {
+  feedbackBar.className = 'feedback-bar ' + (isCorrect ? 'correct' : 'wrong');
+  feedbackBar.textContent = msg;
+}
+
+/* ─── Next Question / End ─────────────────────────────────────── */
+function scheduleNext() {
+  setTimeout(() => {
+    state.index++;
+    if (state.index < QUESTIONS.length) {
+      // Animate out then in
+      const card = $('quiz-screen');
+      card.classList.add('slide-out');
+      setTimeout(() => {
+        card.classList.remove('slide-out');
+        loadQuestion();
+        card.classList.add('slide-in');
+      }, 310);
+    } else {
+      endQuiz();
+    }
+  }, 1600);
+}
+
+/* ─── End Quiz ────────────────────────────────────────────────── */
+function endQuiz() {
+  progressFill.style.width = '100%';
+
+  const total    = QUESTIONS.length;
+  const correct  = state.results.filter(r => r.correct).length;
+  const wrong    = total - correct;
+  const pct      = Math.round((correct / total) * 100);
+  const avgTime  = Math.round(state.results.reduce((s, r) => s + r.timeTaken, 0) / total);
+
+  // Emoji & title
+  let emoji, title;
+  if (pct === 100)     { emoji = '🏆'; title = 'Perfect Score!'; }
+  else if (pct >= 80)  { emoji = '🎉'; title = 'Excellent!'; }
+  else if (pct >= 60)  { emoji = '👍'; title = 'Good Job!'; }
+  else if (pct >= 40)  { emoji = '😅'; title = 'Keep Practicing!'; }
+  else                 { emoji = '💪'; title = 'Don\'t Give Up!'; }
+
+  $('results-emoji').textContent  = emoji;
+  $('results-title').textContent  = title;
+  $('results-subtitle').textContent = `You scored ${correct} out of ${total} questions correctly.`;
+  $('stat-correct').textContent   = correct;
+  $('stat-wrong').textContent     = wrong;
+  $('stat-time').textContent      = avgTime + 's';
+  $('final-score-pct').textContent= pct + '%';
+
+  // Colour the big ring
+  const arc       = $('result-arc');
+  const circum    = 364.42;
+  const ringColour = pct >= 70 ? '#22c55e' : pct >= 40 ? '#f59e0b' : '#ef4444';
+  arc.style.stroke = ringColour;
+
+  showScreen('results', 'fade-in');
+
+  // Animate ring after paint
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      arc.style.strokeDashoffset = circum * (1 - pct / 100);
+    });
+  });
+
+  // Build summary list
+  buildSummary();
+}
+
+/* ─── Summary List ────────────────────────────────────────────── */
+function buildSummary() {
+  const list = $('summary-list');
+  list.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const r    = state.results[i];
+    const item = document.createElement('div');
+    item.className = 'summary-item ' + (r.correct ? 'correct-item' : 'wrong-item');
+
+    const yourText = r.yourAnswer === -1
+      ? 'No answer (timed out)'
+      : q.options[r.yourAnswer];
+
+    item.innerHTML = `
+      <div class="summary-q">${i + 1}. ${escHtml(q.question)}</div>
+      <div class="summary-ans">
+        ${!r.correct ? `<span class="your">Your answer: ${escHtml(yourText)}</span>` : ''}
+        <span class="right">${r.correct ? '✅' : '✔'} Correct: ${escHtml(q.options[q.answer])}</span>
+      </div>`;
+    list.appendChild(item);
+  });
+}
+
+$('summary-toggle').addEventListener('click', () => {
+  const list = $('summary-list');
+  list.classList.toggle('open');
+  $('toggle-icon').textContent = list.classList.contains('open') ? '▲' : '▼';
+});
+
+/* ─── Restart ─────────────────────────────────────────────────── */
+$('restart-btn').addEventListener('click', () => {
+  $('summary-list').classList.remove('open');
+  $('toggle-icon').textContent = '▼';
+  initState();
+  qTotal.textContent = QUESTIONS.length;
+  showScreen('quiz', 'slide-in');
+  loadQuestion();
+});
+
+/* ─── Review (scroll to summary) ─────────────────────────────── */
+$('review-btn').addEventListener('click', () => {
+  const list = $('summary-list');
+  list.classList.add('open');
+  $('toggle-icon').textContent = '▲';
+  list.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+/* ─── Utility ─────────────────────────────────────────────────── */
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
