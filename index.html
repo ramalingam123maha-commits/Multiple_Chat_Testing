@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Resume Builder</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Online Resume Builder</p>
+      <h1>Create a polished resume in minutes</h1>
+    </div>
+    <button id="downloadBtn" class="download-btn" type="button">Download PDF</button>
+  </header>
+
+  <main class="app-shell">
+    <section class="form-panel" aria-label="Resume form">
+      <form id="resumeForm">
+        <section class="card">
+          <h2>Personal Info</h2>
+          <label>
+            Full name
+            <input id="fullName" type="text" placeholder="Alex Morgan" />
+          </label>
+          <label>
+            Professional title
+            <input id="title" type="text" placeholder="Product Designer" />
+          </label>
+          <div class="two-col">
+            <label>
+              Email
+              <input id="email" type="email" placeholder="alex@email.com" />
+            </label>
+            <label>
+              Phone
+              <input id="phone" type="tel" placeholder="(555) 123-4567" />
+            </label>
+          </div>
+          <label>
+            Location
+            <input id="location" type="text" placeholder="Austin, TX" />
+          </label>
+          <label>
+            Professional summary
+            <textarea id="summary" rows="4" placeholder="A concise overview of your background, strengths, and career goals."></textarea>
+          </label>
+        </section>
+
+        <section class="card">
+          <div class="section-heading">
+            <h2>Work Experience</h2>
+            <button class="ghost-btn" id="addExperience" type="button">Add role</button>
+          </div>
+          <div id="experienceFields" class="dynamic-list"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-heading">
+            <h2>Education</h2>
+            <button class="ghost-btn" id="addEducation" type="button">Add school</button>
+          </div>
+          <div id="educationFields" class="dynamic-list"></div>
+        </section>
+
+        <section class="card">
+          <h2>Skills</h2>
+          <label>
+            Skills separated by commas
+            <textarea id="skills" rows="3" placeholder="Leadership, Figma, JavaScript, Data analysis"></textarea>
+          </label>
+        </section>
+      </form>
+    </section>
+
+    <aside class="preview-panel" aria-label="Live resume preview">
+      <div class="preview-toolbar">
+        <span>Live preview</span>
+      </div>
+      <article id="resumePreview" class="resume-paper">
+        <header class="resume-header">
+          <h2 id="previewName">Alex Morgan</h2>
+          <p id="previewTitle">Product Designer</p>
+          <div id="previewContact" class="contact-line">alex@email.com • (555) 123-4567 • Austin, TX</div>
+        </header>
+
+        <section class="resume-section" id="summarySection">
+          <h3>Summary</h3>
+          <p id="previewSummary">A concise overview of your background, strengths, and career goals.</p>
+        </section>
+
+        <section class="resume-section" id="experienceSection">
+          <h3>Work Experience</h3>
+          <div id="previewExperience"></div>
+        </section>
+
+        <section class="resume-section" id="educationSection">
+          <h3>Education</h3>
+          <div id="previewEducation"></div>
+        </section>
+
+        <section class="resume-section" id="skillsSection">
+          <h3>Skills</h3>
+          <div id="previewSkills" class="skills-list"></div>
+        </section>
+      </article>
+    </aside>
+  </main>
+</body>
+</html>
