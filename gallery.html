@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminary — Online Art Gallery</title>
+    <link rel="stylesheet" href="gallery.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ── NAV ─────────────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="#" class="logo">
+                <span class="logo-icon">◈</span>
+                <span class="logo-text">Luminary</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#gallery">Gallery</a></li>
+                <li><a href="#artist">Artist</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">&#9776;</button>
+        </div>
+    </nav>
+
+    <!-- ── HERO ──────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-bg-shapes">
+            <span class="shape shape-1"></span>
+            <span class="shape shape-2"></span>
+            <span class="shape shape-3"></span>
+        </div>
+        <div class="hero-content">
+            <p class="hero-eyebrow">Welcome to the gallery</p>
+            <h1 class="hero-title">Where Art<br><em>Comes Alive</em></h1>
+            <p class="hero-sub">Explore a curated collection of paintings, photography, digital art&nbsp;&amp;&nbsp;sculpture.</p>
+            <a href="#gallery" class="btn btn-primary">Browse Collection</a>
+        </div>
+        <div class="hero-scroll-hint">
+            <span></span>
+        </div>
+    </section>
+
+    <!-- ── GALLERY ───────────────────────────────────────── -->
+    <section id="gallery" class="gallery-section">
+        <div class="section-header">
+            <h2 class="section-title">The Collection</h2>
+            <p class="section-sub">Click any piece to explore it in full detail</p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-bar" role="group" aria-label="Filter artworks by category">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="painting">Painting</button>
+            <button class="filter-btn" data-filter="photography">Photography</button>
+            <button class="filter-btn" data-filter="digital">Digital</button>
+            <button class="filter-btn" data-filter="sculpture">Sculpture</button>
+        </div>
+
+        <!-- Masonry Grid -->
+        <div class="masonry-grid" id="masonryGrid">
+
+            <article class="masonry-item" data-category="painting" data-title="Crimson Dusk" data-artist="Elena Vasquez" data-year="2023" data-medium="Oil on canvas">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=80" alt="Crimson Dusk – abstract warm painting" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Crimson Dusk fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Painting</span>
+                        <h3 class="art-title">Crimson Dusk</h3>
+                        <p class="art-meta">Elena Vasquez · 2023</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item tall" data-category="photography" data-title="Urban Solitude" data-artist="Marcus Chen" data-year="2022" data-medium="Digital photography">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=600&q=80" alt="Urban Solitude – city street photography" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Urban Solitude fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Photography</span>
+                        <h3 class="art-title">Urban Solitude</h3>
+                        <p class="art-meta">Marcus Chen · 2022</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item" data-category="digital" data-title="Neural Dreams" data-artist="Sofia Larsen" data-year="2024" data-medium="Digital illustration">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=600&q=80" alt="Neural Dreams – digital art" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Neural Dreams fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Digital</span>
+                        <h3 class="art-title">Neural Dreams</h3>
+                        <p class="art-meta">Sofia Larsen · 2024</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item wide" data-category="sculpture" data-title="Frozen Motion" data-artist="James Okafor" data-year="2021" data-medium="Bronze casting">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80" alt="Frozen Motion – bronze sculpture" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Frozen Motion fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Sculpture</span>
+                        <h3 class="art-title">Frozen Motion</h3>
+                        <p class="art-meta">James Okafor · 2021</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item" data-category="painting" data-title="Indigo Fields" data-artist="Elena Vasquez" data-year="2023" data-medium="Acrylic on canvas">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=600&q=80" alt="Indigo Fields – abstract painting" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Indigo Fields fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Painting</span>
+                        <h3 class="art-title">Indigo Fields</h3>
+                        <p class="art-meta">Elena Vasquez · 2023</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item tall" data-category="photography" data-title="Golden Hour" data-artist="Marcus Chen" data-year="2023" data-medium="Film photography">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80" alt="Golden Hour – landscape photography" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Golden Hour fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Photography</span>
+                        <h3 class="art-title">Golden Hour</h3>
+                        <p class="art-meta">Marcus Chen · 2023</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item" data-category="digital" data-title="Pixel Bloom" data-artist="Sofia Larsen" data-year="2024" data-medium="Generative art">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?w=600&q=80" alt="Pixel Bloom – generative digital art" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Pixel Bloom fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Digital</span>
+                        <h3 class="art-title">Pixel Bloom</h3>
+                        <p class="art-meta">Sofia Larsen · 2024</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item" data-category="sculpture" data-title="White Silence" data-artist="James Okafor" data-year="2022" data-medium="Marble carving">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?w=600&q=80" alt="White Silence – marble sculpture" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View White Silence fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Sculpture</span>
+                        <h3 class="art-title">White Silence</h3>
+                        <p class="art-meta">James Okafor · 2022</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item wide" data-category="painting" data-title="Ocean Memory" data-artist="Elena Vasquez" data-year="2022" data-medium="Watercolour">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=900&q=80" alt="Ocean Memory – watercolour painting" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Ocean Memory fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Painting</span>
+                        <h3 class="art-title">Ocean Memory</h3>
+                        <p class="art-meta">Elena Vasquez · 2022</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item" data-category="photography" data-title="Neon Rain" data-artist="Marcus Chen" data-year="2024" data-medium="Digital photography">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1533236897111-3e94666b2edf?w=600&q=80" alt="Neon Rain – night cityscape" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Neon Rain fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Photography</span>
+                        <h3 class="art-title">Neon Rain</h3>
+                        <p class="art-meta">Marcus Chen · 2024</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item" data-category="digital" data-title="Synthwave" data-artist="Sofia Larsen" data-year="2023" data-medium="3D render">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=600&q=80" alt="Synthwave – 3D digital art" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Synthwave fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Digital</span>
+                        <h3 class="art-title">Synthwave</h3>
+                        <p class="art-meta">Sofia Larsen · 2023</p>
+                    </div>
+                </div>
+            </article>
+
+            <article class="masonry-item tall" data-category="sculpture" data-title="Gravity" data-artist="James Okafor" data-year="2024" data-medium="Steel welding">
+                <div class="art-card">
+                    <div class="art-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1606041008023-472dfb5e530f?w=600&q=80" alt="Gravity – steel sculpture" loading="lazy">
+                        <div class="art-overlay">
+                            <button class="overlay-zoom" aria-label="View Gravity fullscreen">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="art-info">
+                        <span class="art-category">Sculpture</span>
+                        <h3 class="art-title">Gravity</h3>
+                        <p class="art-meta">James Okafor · 2024</p>
+                    </div>
+                </div>
+            </article>
+
+        </div><!-- /masonry-grid -->
+
+        <p class="no-results" id="noResults" hidden>No artworks found in this category.</p>
+    </section>
+
+    <!-- ── LIGHTBOX ───────────────────────────────────────── -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Artwork viewer" hidden>
+        <button class="lb-close" id="lbClose" aria-label="Close lightbox">&#x2715;</button>
+        <button class="lb-prev" id="lbPrev" aria-label="Previous artwork">&#8592;</button>
+        <button class="lb-next" id="lbNext" aria-label="Next artwork">&#8594;</button>
+        <div class="lb-content">
+            <div class="lb-img-wrap">
+                <img src="" alt="" id="lbImg" class="lb-img">
+            </div>
+            <div class="lb-meta">
+                <span class="lb-category" id="lbCategory"></span>
+                <h2 class="lb-title" id="lbTitle"></h2>
+                <p class="lb-artist" id="lbArtist"></p>
+                <div class="lb-details">
+                    <div class="lb-detail-row"><span>Year</span><strong id="lbYear"></strong></div>
+                    <div class="lb-detail-row"><span>Medium</span><strong id="lbMedium"></strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="lightbox-overlay" id="lightboxOverlay"></div>
+
+    <!-- ── STATS ─────────────────────────────────────────── -->
+    <section class="stats-section">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <span class="stat-number" data-target="120">0</span>
+                <span class="stat-label">Artworks</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="24">0</span>
+                <span class="stat-label">Artists</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="4">0</span>
+                <span class="stat-label">Categories</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" data-target="8">0</span>
+                <span class="stat-label">Exhibitions</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── ARTIST BIO ─────────────────────────────────────── -->
+    <section id="artist" class="artist-section">
+        <div class="section-header">
+            <h2 class="section-title">Featured Artists</h2>
+            <p class="section-sub">The creative minds behind the collection</p>
+        </div>
+
+        <div class="artists-grid">
+
+            <div class="artist-card" data-filter-link="painting">
+                <div class="artist-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=300&q=80" alt="Elena Vasquez" class="artist-avatar">
+                    <span class="artist-badge">Painter</span>
+                </div>
+                <div class="artist-body">
+                    <h3 class="artist-name">Elena Vasquez</h3>
+                    <p class="artist-origin">Barcelona, Spain · Est. 2015</p>
+                    <p class="artist-bio">
+                        Elena's work is a conversation between colour and emotion. Trained at the Barcelona Fine Arts Academy, she blends classical oil techniques with contemporary abstract expression — her canvases feel like memories you never quite had.
+                    </p>
+                    <div class="artist-tags">
+                        <span>Oil</span><span>Acrylic</span><span>Watercolour</span>
+                    </div>
+                    <button class="btn btn-outline artist-filter-btn" data-filter="painting">View Paintings</button>
+                </div>
+            </div>
+
+            <div class="artist-card" data-filter-link="photography">
+                <div class="artist-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80" alt="Marcus Chen" class="artist-avatar">
+                    <span class="artist-badge">Photographer</span>
+                </div>
+                <div class="artist-body">
+                    <h3 class="artist-name">Marcus Chen</h3>
+                    <p class="artist-origin">Tokyo, Japan · Est. 2012</p>
+                    <p class="artist-bio">
+                        Marcus captures the invisible language of cities — the pause between neon and night, the geometry of loneliness. His dual practice in film and digital photography won him the 2021 Asia-Pacific Lens Award.
+                    </p>
+                    <div class="artist-tags">
+                        <span>Film</span><span>Digital</span><span>Street</span>
+                    </div>
+                    <button class="btn btn-outline artist-filter-btn" data-filter="photography">View Photography</button>
+                </div>
+            </div>
+
+            <div class="artist-card" data-filter-link="digital">
+                <div class="artist-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80" alt="Sofia Larsen" class="artist-avatar">
+                    <span class="artist-badge">Digital</span>
+                </div>
+                <div class="artist-body">
+                    <h3 class="artist-name">Sofia Larsen</h3>
+                    <p class="artist-origin">Stockholm, Sweden · Est. 2018</p>
+                    <p class="artist-bio">
+                        Sofia navigates the frontier where algorithms meet intuition. Her generative and 3D works explore digital consciousness — featured in MoMA's 2023 New Media exhibition and collected by galleries across Europe.
+                    </p>
+                    <div class="artist-tags">
+                        <span>Generative</span><span>3D</span><span>AI-assisted</span>
+                    </div>
+                    <button class="btn btn-outline artist-filter-btn" data-filter="digital">View Digital</button>
+                </div>
+            </div>
+
+            <div class="artist-card" data-filter-link="sculpture">
+                <div class="artist-avatar-wrap">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80" alt="James Okafor" class="artist-avatar">
+                    <span class="artist-badge">Sculptor</span>
+                </div>
+                <div class="artist-body">
+                    <h3 class="artist-name">James Okafor</h3>
+                    <p class="artist-origin">Lagos, Nigeria · Est. 2009</p>
+                    <p class="artist-bio">
+                        James forges stories from steel, bronze, and marble. His monumental sculptures address themes of identity, migration, and resilience — permanent installations stand in New York, London, and Nairobi.
+                    </p>
+                    <div class="artist-tags">
+                        <span>Bronze</span><span>Steel</span><span>Marble</span>
+                    </div>
+                    <button class="btn btn-outline artist-filter-btn" data-filter="sculpture">View Sculptures</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── CONTACT ───────────────────────────────────────── -->
+    <section id="contact" class="contact-section">
+        <div class="contact-inner">
+            <h2 class="contact-title">Acquire a Piece</h2>
+            <p class="contact-sub">Interested in purchasing, commissioning, or exhibiting? Reach out and we'll connect you with the artist directly.</p>
+            <form class="contact-form" id="contactForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cName">Name</label>
+                        <input type="text" id="cName" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cEmail">Email</label>
+                        <input type="email" id="cEmail" placeholder="you@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cMessage">Message</label>
+                    <textarea id="cMessage" rows="4" placeholder="Tell us which artwork caught your eye…" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+                <p class="form-success" id="formSuccess" hidden>✓ Message sent! We'll be in touch within 24 hours.</p>
+            </form>
+        </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────── -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="logo-icon">◈</span>
+                <span class="logo-text">Luminary</span>
+            </div>
+            <p class="footer-copy">&copy; 2024 Luminary Gallery. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Instagram</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="gallery.js"></script>
+</body>
+</html>
