@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Password Generator</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="bg-grid"></div>
+
+    <main class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">Password Generator</h1>
+          <p class="header-subtitle">Create cryptographically secure passwords</p>
+        </div>
+      </header>
+
+      <!-- Card -->
+      <div class="card">
+
+        <!-- Password Display -->
+        <div class="password-display-wrapper">
+          <div class="password-display" id="passwordDisplay">
+            <span class="password-text" id="passwordText">Click Generate</span>
+          </div>
+          <div class="display-actions">
+            <button class="icon-btn" id="refreshBtn" title="Regenerate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+            </button>
+            <button class="icon-btn copy-btn" id="copyBtn" title="Copy to clipboard">
+              <svg class="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <svg class="icon-check hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="copy-label">Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Strength Bar -->
+        <div class="strength-wrapper">
+          <div class="strength-info">
+            <span class="strength-label">Strength</span>
+            <span class="strength-text" id="strengthText">—</span>
+          </div>
+          <div class="strength-bar-track">
+            <div class="strength-bar-fill" id="strengthBar"></div>
+          </div>
+          <div class="strength-segments">
+            <span>Weak</span>
+            <span>Fair</span>
+            <span>Good</span>
+            <span>Strong</span>
+            <span>Very Strong</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+
+          <!-- Length -->
+          <div class="control-group">
+            <div class="control-header">
+              <label class="control-label" for="lengthSlider">Length</label>
+              <div class="length-input-wrapper">
+                <input
+                  type="number"
+                  class="length-number"
+                  id="lengthNumber"
+                  value="16"
+                  min="4"
+                  max="128"
+                />
+              </div>
+            </div>
+            <input
+              type="range"
+              class="slider"
+              id="lengthSlider"
+              min="4"
+              max="128"
+              value="16"
+            />
+            <div class="slider-labels">
+              <span>4</span>
+              <span>32</span>
+              <span>64</span>
+              <span>96</span>
+              <span>128</span>
+            </div>
+          </div>
+
+          <!-- Toggles -->
+          <div class="toggles-grid">
+
+            <div class="toggle-card" id="toggleUppercase">
+              <div class="toggle-icon uppercase-icon">A</div>
+              <div class="toggle-body">
+                <span class="toggle-name">Uppercase</span>
+                <span class="toggle-chars">A–Z</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="useUppercase" checked />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+
+            <div class="toggle-card" id="toggleLowercase">
+              <div class="toggle-icon lowercase-icon">a</div>
+              <div class="toggle-body">
+                <span class="toggle-name">Lowercase</span>
+                <span class="toggle-chars">a–z</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="useLowercase" checked />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+
+            <div class="toggle-card" id="toggleNumbers">
+              <div class="toggle-icon numbers-icon">0</div>
+              <div class="toggle-body">
+                <span class="toggle-name">Numbers</span>
+                <span class="toggle-chars">0–9</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="useNumbers" checked />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+
+            <div class="toggle-card" id="toggleSymbols">
+              <div class="toggle-icon symbols-icon">#</div>
+              <div class="toggle-body">
+                <span class="toggle-name">Symbols</span>
+                <span class="toggle-chars">!@#$…</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="useSymbols" />
+                <span class="slider-toggle"></span>
+              </label>
+            </div>
+
+          </div>
+
+          <!-- Advanced Options -->
+          <div class="advanced-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="excludeAmbiguous" />
+              <span class="custom-checkbox"></span>
+              Exclude ambiguous characters <span class="hint">(0Ol1I)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="noRepeat" />
+              <span class="custom-checkbox"></span>
+              No repeating characters
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Generate Button -->
+        <button class="generate-btn" id="generateBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Generate Password
+        </button>
+
+      </div>
+
+      <!-- History Panel -->
+      <div class="history-panel" id="historyPanel">
+        <div class="history-header">
+          <h2 class="history-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="12 8 12 12 14 14"></polyline>
+              <path d="M3.05 11a9 9 0 1 0 .5-4"></path>
+              <polyline points="3 3 3 7 7 7"></polyline>
+            </svg>
+            History
+          </h2>
+          <button class="clear-btn" id="clearHistoryBtn">Clear all</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty" id="historyEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <p>No passwords generated yet</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
