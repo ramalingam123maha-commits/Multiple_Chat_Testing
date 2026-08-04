@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Generator</title>
+    <link rel="stylesheet" href="color-palette.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="generator">
+                <span class="icon">🎨</span> Generator
+            </button>
+            <button class="nav-tab" data-tab="saved">
+                <span class="icon">💾</span> Saved Palettes
+            </button>
+        </nav>
+
+        <!-- Generator Tab -->
+        <section id="generator-tab" class="tab-content active">
+            <header class="header">
+                <div class="header-content">
+                    <h1>🎨 Color Palette Generator</h1>
+                    <p>Create harmonious color schemes instantly</p>
+                </div>
+                
+                <div class="header-controls">
+                    <div class="mode-selector">
+                        <label for="harmonyMode">Harmony Mode:</label>
+                        <select id="harmonyMode">
+                            <option value="complementary">Complementary</option>
+                            <option value="analogous">Analogous</option>
+                            <option value="triadic">Triadic</option>
+                            <option value="tetradic">Tetradic</option>
+                            <option value="monochromatic">Monochromatic</option>
+                            <option value="random">Random</option>
+                        </select>
+                    </div>
+                    <button id="generateBtn" class="btn btn-primary">
+                        <span class="icon">✨</span> Generate Palette
+                    </button>
+                </div>
+            </header>
+
+            <!-- Palette Grid -->
+            <div class="palette-container">
+                <div id="paletteGrid" class="palette-grid">
+                    <!-- Color cards will be generated here -->
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <button id="savePaletteBtn" class="btn btn-secondary" title="Save current palette">
+                    <span class="icon">💾</span> Save Palette
+                </button>
+                <button id="exportCssBtn" class="btn btn-secondary" title="Export as CSS variables">
+                    <span class="icon">📄</span> Export CSS
+                </button>
+                <button id="exportJsonBtn" class="btn btn-secondary" title="Export as JSON">
+                    <span class="icon">📋</span> Export JSON
+                </button>
+            </div>
+        </section>
+
+        <!-- Saved Palettes Tab -->
+        <section id="saved-tab" class="tab-content">
+            <header class="header">
+                <div class="header-content">
+                    <h1>💾 Saved Palettes</h1>
+                    <p>Browse and manage your saved color schemes</p>
+                </div>
+                <button id="clearAllBtn" class="btn btn-danger" title="Clear all saved palettes">
+                    <span class="icon">🗑️</span> Clear All
+                </button>
+            </header>
+
+            <div id="savedPalettesContainer" class="saved-palettes-container">
+                <!-- Saved palettes will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+
+        <!-- Save Palette Modal -->
+        <div id="savePaletteModal" class="modal">
+            <div class="modal-content">
+                <h2>Save Palette</h2>
+                <input 
+                    type="text" 
+                    id="paletteName" 
+                    class="input" 
+                    placeholder="Enter palette name..."
+                    autocomplete="off"
+                >
+                <div class="modal-buttons">
+                    <button id="modalCancelBtn" class="btn btn-secondary">Cancel</button>
+                    <button id="modalSaveBtn" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Modal -->
+        <div id="exportModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Export Palette</h2>
+                    <button id="exportCloseBtn" class="close-btn">&times;</button>
+                </div>
+                <div id="exportContent" class="export-content">
+                    <!-- Export content will be inserted here -->
+                </div>
+                <button id="copyExportBtn" class="btn btn-primary" style="width: 100%;">
+                    <span class="icon">📋</span> Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="color-palette.js"></script>
+</body>
+</html>
