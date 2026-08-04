@@ -1,0 +1,333 @@
+/* ============================================================
+   MEME GENERATOR — style.css
+   ============================================================ */
+
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --border: #e2e4e9;
+  --text: #1a1c23;
+  --text-muted: #6b7080;
+  --accent: #6d5ef8;
+  --accent-hover: #5a4bdb;
+  --accent-soft: #ecebff;
+  --radius: 14px;
+  --shadow: 0 4px 16px rgba(20, 20, 40, 0.06);
+  --shadow-lg: 0 12px 32px rgba(20, 20, 40, 0.1);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+
+.app-header {
+  padding: 40px 0 28px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--accent-soft), transparent);
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.app-header__logo { font-size: 1.8rem; }
+
+.app-header__tagline {
+  margin: 10px auto 0;
+  max-width: 480px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 300px;
+  gap: 22px;
+  align-items: start;
+  padding-bottom: 60px;
+}
+
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.panel__title {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.panel__subtitle {
+  margin: 20px 0 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Upload zone ────────────────────────────────────────── */
+
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 14px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.upload-zone:hover,
+.upload-zone:focus-visible,
+.upload-zone.dragover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.upload-zone__text { font-size: 0.9rem; color: var(--text); }
+.upload-zone__hint { font-size: 0.78rem; }
+
+/* ── Template gallery ───────────────────────────────────── */
+
+.template-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.template-btn {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+
+.template-btn canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.template-btn:hover,
+.template-btn:focus-visible {
+  border-color: var(--accent);
+}
+
+.template-btn.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.template-btn__label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 0.65rem;
+  padding: 3px 4px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Canvas panel ───────────────────────────────────────── */
+
+.panel--canvas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.canvas-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: repeating-conic-gradient(#f0f0f3 0% 25%, #fafafc 0% 50%) 50% / 22px 22px;
+  border-radius: 10px;
+  min-height: 320px;
+  overflow: hidden;
+}
+
+#meme-canvas {
+  max-width: 100%;
+  max-height: 560px;
+  display: block;
+}
+
+.canvas-placeholder {
+  position: absolute;
+  margin: 0;
+  padding: 0 30px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.canvas-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+
+.btn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Controls panel ─────────────────────────────────────── */
+
+.text-group {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 0 0 16px;
+}
+
+.text-group legend {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0 4px;
+}
+
+.text-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.control-row label {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.control-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.control-row output {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  min-width: 40px;
+  text-align: right;
+}
+
+.control-row input[type="color"] {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meme Generator</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Anton&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-header__inner container">
+      <div class="app-header__brand">
+        <span class="app-header__logo" aria-hidden="true">😂</span>
+        <span>Meme Generator</span>
+      </div>
+      <p class="app-header__tagline">Upload a photo or pick a template, add your caption, and export in seconds.</p>
+    </div>
+  </header>
+
+  <main class="container layout">
+
+    <!-- ░░ SOURCE PANEL ░░ -->
+    <section class="panel panel--source" aria-labelledby="source-heading">
+      <h2 id="source-heading" class="panel__title">1. Choose an image</h2>
+
+      <label class="upload-zone" id="upload-zone" for="file-input" tabindex="0">
+        <input type="file" id="file-input" accept="image/*" class="visually-hidden" />
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 16V4M12 4l-4 4M12 4l4 4"/>
+          <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+        </svg>
+        <span class="upload-zone__text"><strong>Click to upload</strong> or drag &amp; drop</span>
+        <span class="upload-zone__hint">PNG, JPG, WEBP</span>
+      </label>
+
+      <h3 class="panel__subtitle">Or pick a template</h3>
+      <div class="template-gallery" id="template-gallery" role="list" aria-label="Meme templates"></div>
+    </section>
+
+    <!-- ░░ CANVAS PANEL ░░ -->
+    <section class="panel panel--canvas" aria-labelledby="canvas-heading">
+      <h2 id="canvas-heading" class="panel__title">2. Preview</h2>
+
+      <div class="canvas-wrap" id="canvas-wrap">
+        <canvas id="meme-canvas" width="600" height="600"></canvas>
+        <p class="canvas-placeholder" id="canvas-placeholder">Upload an image or pick a template to get started</p>
+      </div>
+
+      <div class="canvas-actions">
+        <button type="button" class="btn btn--ghost" id="reset-btn">Reset</button>
+        <button type="button" class="btn btn--primary" id="download-btn" disabled>⬇ Download Meme</button>
+      </div>
+    </section>
+
+    <!-- ░░ CONTROLS PANEL ░░ -->
+    <section class="panel panel--controls" aria-labelledby="controls-heading">
+      <h2 id="controls-heading" class="panel__title">3. Add your text</h2>
+
+      <fieldset class="text-group">
+        <legend>Top text</legend>
+        <input type="text" id="top-text" class="text-input" placeholder="TOP TEXT" maxlength="80" />
+        <div class="control-row">
+          <label for="top-size">Font size</label>
+          <input type="range" id="top-size" min="12" max="120" value="48" />
+          <output for="top-size" id="top-size-val">48px</output>
+        </div>
+        <div class="control-row">
+          <label for="top-color">Text color</label>
+          <input type="color" id="top-color" value="#ffffff" />
+        </div>
+      </fieldset>
+
+      <fieldset class="text-group">
+        <legend>Bottom text</legend>
+        <input type="text" id="bottom-text" class="text-input" placeholder="BOTTOM TEXT" maxlength="80" />
+        <div class="control-row">
+          <label for="bottom-size">Font size</label>
+          <input type="range" id="bottom-size" min="12" max="120" value="48" />
+          <output for="bottom-size" id="bottom-size-val">48px</output>
+        </div>
+        <div class="control-row">
+          <label for="bottom-color">Text color</label>
+          <input type="color" id="bottom-color" value="#ffffff" />
+        </div>
+      </fieldset>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
