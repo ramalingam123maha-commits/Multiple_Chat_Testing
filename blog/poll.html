@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poll Creator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --primary-light: #ede9fe;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --neutral-50: #f9fafb;
+      --neutral-100: #f3f4f6;
+      --neutral-200: #e5e7eb;
+      --neutral-300: #d1d5db;
+      --neutral-400: #9ca3af;
+      --neutral-500: #6b7280;
+      --neutral-600: #4b5563;
+      --neutral-700: #374151;
+      --neutral-800: #1f2937;
+      --neutral-900: #111827;
+      --radius: 0.5rem;
+      --radius-lg: 1rem;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --transition: all 0.2s ease;
+    }
+
+    [data-theme="dark"] {
+      --neutral-50: #111827;
+      --neutral-100: #1f2937;
+      --neutral-200: #374151;
+      --neutral-300: #4b5563;
+      --neutral-400: #6b7280;
+      --neutral-500: #9ca3af;
+      --neutral-600: #d1d5db;
+      --neutral-700: #e5e7eb;
+      --neutral-800: #f3f4f6;
+      --neutral-900: #f9fafb;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--neutral-50);
+      color: var(--neutral-900);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    [data-theme="dark"] body {
+      background: var(--neutral-900);
+      color: var(--neutral-50);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--neutral-200);
+      background: var(--neutral-50);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .header {
+      background: var(--neutral-800);
+      border-bottom-color: var(--neutral-700);
+    }
+
+    .header.scrolled {
+      box-shadow: var(--shadow-md);
+    }
+
+    .header__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header__logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .header__logo:hover {
+      color: var(--primary-dark);
+    }
+
+    .header__actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* ── Main Container ── */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      padding: 2rem 0;
+    }
+
+    @media (max-width: 968px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Sidebar (Create Poll) ── */
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .card {
+      background: var(--neutral-800);
+      border-color: var(--neutral-700);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--neutral-900);
+    }
+
+    [data-theme="dark"] .card__title {
+      color: var(--neutral-50);
+    }
+
+    /* ── Form ── */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--neutral-700);
+    }
+
+    [data-theme="dark"] .form-group label {
+      color: var(--neutral-300);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--neutral-300);
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .form-group input,
+    [data-theme="dark"] .form-group textarea {
+      background: var(--neutral-700);
+      border-color: var(--neutral-600);
+      color: var(--neutral-50);
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-group textarea {
+      resize: none;
+      min-height: 80px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .option-input-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .option-input-wrapper input {
+      flex: 1;
+    }
+
+    .btn-remove {
+      padding: 0.5rem;
+      background: var(--error);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.75rem;
+    }
+
+    .btn-remove:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--neutral-100);
+      color: var(--neutral-900);
+      border: 1px solid var(--neutral-300);
+      border-radius: var(--radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 0.75rem;
+    }
+
+    [data-theme="dark"] .btn-secondary {
+      background: var(--neutral-700);
+      color: var(--neutral-50);
+      border-color: var(--neutral-600);
+    }
+
+    .btn-secondary:hover {
+      background: var(--neutral-200);
+    }
+
+    [data-theme="dark"] .btn-secondary:hover {
+      background: var(--neutral-600);
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-icon {
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--neutral-600);
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .btn-icon {
+      color: var(--neutral-400);
+    }
+
+    .btn-icon:hover {
+      color: var(--primary);
+    }
+
+    /* ── Polls Grid ── */
+    .polls-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .poll-item {
+      background: white;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: var(--transition);
+    }
+
+    [data-theme="dark"] .poll-item {
+      background: var(--neutral-800);
+      border-color: var(--neutral-700);
+    }
+
+    .poll-item:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .poll-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .poll-question {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--neutral-900);
+    }
+
+    [data-theme="dark"] .poll-question {
+      color: var(--neutral-50);
+    }
+
+    .poll-meta {
+      font-size: 0.875rem;
+      color: var(--neutral-500);
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .poll-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .poll-option {
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .poll-option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      transition: var(--transition);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .poll-option-label:hover {
+      background: var(--primary-light);
+    }
+
+    [data-theme="dark"] .poll-option-label:hover {
+      background: var(--neutral-700);
+    }
+
+    .poll-option-radio {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid var(--neutral-300);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    [data-theme="dark"] .poll-option-radio {
+      border-color: var(--neutral-600);
+    }
+
+    .poll-option input[type="radio"] {
+      appearance: none;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .poll-option input[type="radio"]:checked ~ .poll-option-radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .poll-option-radio::after {
+      content: '';
+      position: absolute;
+      width: 0.5rem;
+      height: 0.5rem;
+      background: white;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .poll-option input[type="radio"]:checked ~ .poll-option-radio::after {
+      opacity: 1;
+    }
+
+    .poll-option-text {
+      font-weight: 500;
+      color: var(--neutral-900);
+      flex: 1;
+    }
+
+    [data-theme="dark"] .poll-option-text {
+      color: var(--neutral-50);
+    }
+
+    .poll-result-bar {
+      height: 2rem;
+      background: var(--neutral-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 0.75rem;
+    }
+
+    [data-theme="dark"] .poll-result-bar {
+      background: var(--neutral-700);
+    }
+
+    .poll-result-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      border-radius: var(--radius);
+      transition: width 0.3s ease;
+      min-width: 2px;
+    }
+
+    .poll-result-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: white;
+      position: absolute;
+      left: 0.75rem;
+      z-index: 1;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .poll-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--neutral-200);
+    }
+
+    [data-theme="dark"] .poll-footer {
+      border-top-color: var(--neutral-700);
+    }
+
+    .poll-stats {
+      font-size: 0.875rem;
+      color: var(--neutral-500);
+    }
+
+    .poll-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-share {
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-share:hover {
+      background: var(--primary-dark);
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--neutral-900);
+    }
+
+    [data-theme="dark"] .empty-title {
+      color: var(--neutral-50);
+    }
+
+    .empty-text {
+      color: var(--neutral-500);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid var(--neutral-300);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: var(--primary);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--error); }
+  </style>
+</head>
+<body data-theme="light">
+
+  <header class="header" id="header">
+    <div class="header__inner container">
+      <a href="#" class="header__logo">
+        <span>📊 Poll Creator</span>
+      </a>
+      <div class="header__actions">
+        <button class="btn-icon" id="theme-toggle" title="Toggle dark mode">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="main-content">
+    <div class="main-content">
+      <!-- Create Poll Sidebar -->
+      <aside class="sidebar">
+        <div class="card">
+          <h2 class="card__title">Create Poll</h2>
+          <form id="poll-form">
+            <div class="form-group">
+              <label for="question">Question</label>
+              <textarea id="question" placeholder="Ask a question..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Options</label>
+              <div id="options-list" class="options-list">
+                <div class="option-input-wrapper">
+                  <input type="text" class="poll-option-input" placeholder="Option 1" required />
+                  <button type="button" class="btn-remove" onclick="removeOption(this)">✕</button>
+                </div>
+                <div class="option-input-wrapper">
+                  <input type="text" class="poll-option-input" placeholder="Option 2" required />
+                  <button type="button" class="btn-remove" onclick="removeOption(this)">✕</button>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary" id="add-option-btn">+ Add Option</button>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Poll</button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- Polls Display -->
+      <section id="polls-section">
+        <div id="polls-list" class="polls-container">
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No polls yet</div>
+            <div class="empty-text">Create a poll to get started!</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // ── Configuration ──
+    const API_URL = location.origin;
+    const WS_URL = `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`;
+
+    // ── State ──
+    let ws = null;
+    let polls = [];
+    let userVotes = new Set();
+
+    // ── Theme Toggle ──
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('poll-theme', newTheme);
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('poll-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // ── WebSocket Connection ──
+    function connectWebSocket() {
+      ws = new WebSocket(WS_URL);
+
+      ws.onopen = () => {
+        console.log('✓ Connected to poll server');
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'initial_load') {
+          polls = data.polls || [];
+          renderPolls();
+        } else if (data.type === 'new_poll') {
+          polls.unshift(data);
+          renderPolls();
+          showToast('New poll created!', 'success');
+        } else if (data.type === 'vote_cast') {
+          polls = data.polls || polls;
+          renderPolls();
+        }
+      };
+
+      ws.onerror = () => {
+        console.error('WebSocket error');
+        showToast('Connection error', 'error');
+      };
+
+      ws.onclose = () => {
+        console.log('Disconnected, attempting reconnect...');
+        setTimeout(connectWebSocket, 3000);
+      };
+    }
+
+    // ── Poll Creation ──
+    document.getElementById('poll-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const question = document.getElementById('question').value;
+      const optionsElements = document.querySelectorAll('.poll-option-input');
+      const options = Array.from(optionsElements)
+        .map(el => el.value.trim())
+        .filter(val => val);
+
+      if (options.length < 2) {
+        showToast('Add at least 2 options', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/polls`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, options, userId: 'user_' + Math.random().toString(36).substring(7) })
+        });
+
+        const result = await response.json();
+        document.getElementById('poll-form').reset();
+        resetOptions();
+        showToast('Poll created!', 'success');
+      } catch (err) {
+        console.error('Error creating poll:', err);
+        showToast('Failed to create poll', 'error');
+      }
+    });
+
+    // ── Add/Remove Options ──
+    document.getElementById('add-option-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const list = document.getElementById('options-list');
+      const count = list.children.length + 1;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'option-input-wrapper';
+      wrapper.innerHTML = `
+        <input type="text" class="poll-option-input" placeholder="Option ${count}" />
+        <button type="button" class="btn-remove" onclick="removeOption(this)">✕</button>
+      `;
+      list.appendChild(wrapper);
+    });
+
+    function removeOption(btn) {
+      const list = document.getElementById('options-list');
+      if (list.children.length > 2) {
+        btn.parentElement.remove();
+      } else {
+        showToast('Keep at least 2 options', 'error');
+      }
+    }
+
+    function resetOptions() {
+      const list = document.getElementById('options-list');
+      list.innerHTML = `
+        <div class="option-input-wrapper">
+          <input type="text" class="poll-option-input" placeholder="Option 1" required />
+          <button type="button" class="btn-remove" onclick="removeOption(this)">✕</button>
+        </div>
+        <div class="option-input-wrapper">
+          <input type="text" class="poll-option-input" placeholder="Option 2" required />
+          <button type="button" class="btn-remove" onclick="removeOption(this)">✕</button>
+        </div>
+      `;
+    }
+
+    // ── Render Polls ──
+    function renderPolls() {
+      const pollsList = document.getElementById('polls-list');
+
+      if (polls.length === 0) {
+        pollsList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No polls yet</div>
+            <div class="empty-text">Create a poll to get started!</div>
+          </div>
+        `;
+        return;
+      }
+
+      pollsList.innerHTML = polls.map(poll => {
+        const totalVotes = poll.options.reduce((sum, opt) => sum + opt.votes, 0);
+        const shareUrl = `${API_URL}/polls/${poll.id}`;
+
+        return `
+          <div class="poll-item" data-poll-id="${poll.id}">
+            <div class="poll-header">
+              <h3 class="poll-question">${escapeHtml(poll.question)}</h3>
+              <div class="poll-meta">
+                <span>📊 ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}</span>
+                <span>🕐 ${new Date(poll.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            <div class="poll-options">
+              ${poll.options.map(opt => {
+                const percentage = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0;
+                const hasVoted = userVotes.has(poll.id);
+                return `
+                  <div class="poll-option">
+                    <label class="poll-option-label">
+                      <input type="radio" name="poll_${poll.id}" data-poll-id="${poll.id}" data-option-id="${opt.id}" 
+                             ${hasVoted ? 'disabled' : ''} onchange="votePoll('${poll.id}', '${opt.id}')" />
+                      <div class="poll-option-radio"></div>
+                      <span class="poll-option-text">${escapeHtml(opt.text)}</span>
+                    </label>
+                    <div class="poll-result-bar">
+                      <div class="poll-result-fill" style="width: ${percentage}%"></div>
+                      <span class="poll-result-text">${percentage}% (${opt.votes})</span>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+
+            <div class="poll-footer">
+              <div class="poll-stats">${totalVotes} total vote${totalVotes !== 1 ? 's' : ''}</div>
+              <div class="poll-actions">
+                <button class="btn-share" onclick="sharePoll('${poll.id}', '${encodeURIComponent(poll.question)}')">
+                  🔗 Share
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ── Vote on Poll ──
+    function votePoll(pollId, optionId) {
+      if (userVotes.has(pollId)) {
+        showToast('You already voted on this poll', 'error');
+        return;
+      }
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'vote',
+          pollId,
+          optionId
+        }));
+        userVotes.add(pollId);
+        showToast('Vote recorded!', 'success');
+      }
+    }
+
+    // ── Share Poll ──
+    function sharePoll(pollId, question) {
+      const shareUrl = `${API_URL}/polls/${pollId}`;
+      const text = `Vote on my poll: ${decodeURIComponent(question)} - ${shareUrl}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Poll',
+          text,
+          url: shareUrl
+        });
+      } else {
+        navigator.clipboard.writeText(shareUrl);
+        showToast('Poll link copied to clipboard!', 'success');
+      }
+    }
+
+    // ── Utils ──
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ── Header Scroll Effect ──
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const header = document.getElementById('header');
+          header.classList.toggle('scrolled', window.scrollY > 12);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // ── Init ──
+    connectWebSocket();
+  </script>
+
+</body>
+</html>

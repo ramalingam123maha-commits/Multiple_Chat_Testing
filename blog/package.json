@@ -1,0 +1,13 @@
+{
+  "name": "poll-creator",
+  "version": "1.0.0",
+  "description": "Real-time poll creator with WebSocket support",
+  "main": "poll-server.js",
+  "scripts": {
+    "start": "node poll-server.js",
+    "dev": "node poll-server.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  }
+}
