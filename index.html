@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Snippet Manager</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">Developer Toolkit</p>
+        <h1 id="page-title">Code Snippet Manager</h1>
+        <p class="hero-copy">Save, tag, search, edit, and copy reusable snippets with Prism.js syntax highlighting.</p>
+      </div>
+      <button class="primary-action" id="newSnippetButton" type="button">Add snippet</button>
+    </section>
+
+    <section class="workspace">
+      <aside class="panel controls" aria-label="Snippet filters">
+        <label class="field-label" for="searchInput">Search snippets</label>
+        <input id="searchInput" class="search-input" type="search" placeholder="Search title, code, notes, or tags" autocomplete="off" />
+
+        <div class="filter-block">
+          <div class="filter-header">
+            <h2>Tags</h2>
+            <button class="text-button" id="clearFiltersButton" type="button">Clear</button>
+          </div>
+          <div class="tag-list" id="tagFilters" aria-label="Filter by tag"></div>
+        </div>
+      </aside>
+
+      <section class="snippet-area" aria-live="polite">
+        <div class="snippet-toolbar">
+          <p id="snippetCount"></p>
+          <select id="languageFilter" aria-label="Filter by language">
+            <option value="all">All languages</option>
+          </select>
+        </div>
+        <div class="snippet-grid" id="snippetGrid"></div>
+        <p class="empty-state" id="emptyState" hidden>No snippets match your filters.</p>
+      </section>
+    </section>
+  </main>
+
+  <dialog class="snippet-dialog" id="snippetDialog">
+    <form id="snippetForm" method="dialog">
+      <div class="dialog-header">
+        <h2 id="dialogTitle">Add snippet</h2>
+        <button class="icon-button" id="closeDialogButton" type="button" aria-label="Close dialog">×</button>
+      </div>
+
+      <input type="hidden" id="snippetId" />
+
+      <label class="field-label" for="titleInput">Title</label>
+      <input id="titleInput" type="text" required maxlength="80" placeholder="Array dedupe helper" />
+
+      <label class="field-label" for="languageInput">Language</label>
+      <select id="languageInput" required>
+        <option value="javascript">JavaScript</option>
+        <option value="typescript">TypeScript</option>
+        <option value="css">CSS</option>
+        <option value="html">HTML</option>
+        <option value="python">Python</option>
+        <option value="bash">Bash</option>
+        <option value="json">JSON</option>
+      </select>
+
+      <label class="field-label" for="tagsInput">Tags <span>(comma separated)</span></label>
+      <input id="tagsInput" type="text" placeholder="arrays, utility, frontend" />
+
+      <label class="field-label" for="descriptionInput">Notes</label>
+      <textarea id="descriptionInput" rows="3" placeholder="When to use this snippet"></textarea>
+
+      <label class="field-label" for="codeInput">Code</label>
+      <textarea id="codeInput" rows="9" required spellcheck="false" placeholder="Paste your code here"></textarea>
+
+      <div class="dialog-actions">
+        <button class="secondary-action" id="cancelButton" type="button">Cancel</button>
+        <button class="primary-action" type="submit">Save snippet</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
