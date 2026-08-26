@@ -38,7 +38,7 @@ const defaultSnippets = [
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error(\`Request failed: ${response.status}\`);
+    throw new Error(\`Request failed: \${response.status}\`);
   }
 
   return response.json();
