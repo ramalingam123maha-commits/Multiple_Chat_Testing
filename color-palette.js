@@ -109,7 +109,7 @@ class ColorPaletteGenerator {
         }
 
         const palette = hueDifferences.map((diff, idx) => {
-            let newHue = (hue + diff) % 360;
+            const newHue = (hue + diff) % 360;
             let newSat = saturation;
             let newLight = lightness;
 
@@ -155,13 +155,13 @@ class ColorPaletteGenerator {
 
     hexToHsl(hex) {
         const rgb = this.hexToRgb(hex);
-        let r = rgb.r / 255;
-        let g = rgb.g / 255;
-        let b = rgb.b / 255;
+        const r = rgb.r / 255;
+        const g = rgb.g / 255;
+        const b = rgb.b / 255;
 
         const max = Math.max(r, g, b);
         const min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
+        let h, s; const l = (max + min) / 2;
 
         if (max === min) {
             h = s = 0;
@@ -229,7 +229,7 @@ class ColorPaletteGenerator {
             card.className = 'color-card';
 
             const hsl = this.hexToHsl(color);
-            const rgb = this.hexToRgb(color);
+            this.hexToRgb(color); // ensure conversion is available for future use
             const colorName = this.getColorName(hsl);
 
             card.innerHTML = `
@@ -336,7 +336,7 @@ class ColorPaletteGenerator {
         this.showExportModal(json, 'JSON Export');
     }
 
-    showExportModal(content, title) {
+    showExportModal(content, _title) {
         const modal = document.getElementById('exportModal');
         document.getElementById('exportContent').textContent = content;
         modal.dataset.content = content;
@@ -462,7 +462,7 @@ class ColorPaletteGenerator {
             const date = new Date(palette.timestamp);
             const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-            let colorsHtml = palette.colors.map(color => 
+            const colorsHtml = palette.colors.map(color => 
                 `<div class="palette-color-mini" style="background-color: ${color}" title="${color}"></div>`
             ).join('');
 
