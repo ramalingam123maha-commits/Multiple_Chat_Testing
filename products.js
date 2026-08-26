@@ -2,111 +2,111 @@
 const products = [
     {
         id: 1,
-        name: "Wireless Headphones",
-        category: "electronics",
+        name: 'Wireless Headphones',
+        category: 'electronics',
         price: 79.99,
         rating: 4.5,
         reviews: 128,
-        emoji: "🎧"
+        emoji: '🎧'
     },
     {
         id: 2,
-        name: "Smart Watch",
-        category: "electronics",
+        name: 'Smart Watch',
+        category: 'electronics',
         price: 199.99,
         rating: 4.8,
         reviews: 256,
-        emoji: "⌚"
+        emoji: '⌚'
     },
     {
         id: 3,
-        name: "Cotton T-Shirt",
-        category: "clothing",
+        name: 'Cotton T-Shirt',
+        category: 'clothing',
         price: 29.99,
         rating: 4.2,
         reviews: 89,
-        emoji: "👕"
+        emoji: '👕'
     },
     {
         id: 4,
-        name: "Denim Jeans",
-        category: "clothing",
+        name: 'Denim Jeans',
+        category: 'clothing',
         price: 59.99,
         rating: 4.4,
         reviews: 156,
-        emoji: "👖"
+        emoji: '👖'
     },
     {
         id: 5,
-        name: "Canvas Backpack",
-        category: "accessories",
+        name: 'Canvas Backpack',
+        category: 'accessories',
         price: 49.99,
         rating: 4.6,
         reviews: 201,
-        emoji: "🎒"
+        emoji: '🎒'
     },
     {
         id: 6,
-        name: "Leather Wallet",
-        category: "accessories",
+        name: 'Leather Wallet',
+        category: 'accessories',
         price: 39.99,
         rating: 4.3,
         reviews: 145,
-        emoji: "👛"
+        emoji: '👛'
     },
     {
         id: 7,
-        name: "Ceramic Pot",
-        category: "home",
+        name: 'Ceramic Pot',
+        category: 'home',
         price: 34.99,
         rating: 4.7,
         reviews: 112,
-        emoji: "🏺"
+        emoji: '🏺'
     },
     {
         id: 8,
-        name: "Desk Lamp",
-        category: "home",
+        name: 'Desk Lamp',
+        category: 'home',
         price: 44.99,
         rating: 4.5,
         reviews: 178,
-        emoji: "🪔"
+        emoji: '🪔'
     },
     {
         id: 9,
-        name: "USB-C Cable",
-        category: "electronics",
+        name: 'USB-C Cable',
+        category: 'electronics',
         price: 14.99,
         rating: 4.6,
         reviews: 634,
-        emoji: "🔌"
+        emoji: '🔌'
     },
     {
         id: 10,
-        name: "Wireless Mouse",
-        category: "electronics",
+        name: 'Wireless Mouse',
+        category: 'electronics',
         price: 34.99,
         rating: 4.4,
         reviews: 342,
-        emoji: "🖱️"
+        emoji: '🖱️'
     },
     {
         id: 11,
-        name: "Sneakers",
-        category: "clothing",
+        name: 'Sneakers',
+        category: 'clothing',
         price: 89.99,
         rating: 4.7,
         reviews: 421,
-        emoji: "👟"
+        emoji: '👟'
     },
     {
         id: 12,
-        name: "Sunglasses",
-        category: "accessories",
+        name: 'Sunglasses',
+        category: 'accessories',
         price: 129.99,
         rating: 4.8,
         reviews: 289,
-        emoji: "😎"
+        emoji: '😎'
     }
 ];
 
@@ -225,12 +225,14 @@ function addToCart(productId, quantity = 1) {
     showAddToCartFeedback();
 }
 
+// eslint-disable-next-line no-unused-vars
 function removeFromCart(productId) {
     appState.cart = appState.cart.filter(item => item.id !== productId);
     saveCart();
     updateCart();
 }
 
+// eslint-disable-next-line no-unused-vars
 function updateCartItemQuantity(productId, quantity) {
     const item = appState.cart.find(item => item.id === productId);
     if (item) {
@@ -309,7 +311,7 @@ function showAddToCartFeedback() {
 }
 
 // Filter Functions
-function handleCategoryFilter(e) {
+function handleCategoryFilter(_e) {
     const selectedCategories = Array.from(categoryFilters)
         .filter(f => f.checked)
         .map(f => f.value);
@@ -373,7 +375,7 @@ function handleResetFilters() {
 }
 
 function applyFilters() {
-    let filtered = products.filter(product => {
+    const filtered = products.filter(product => {
         // Category filter
         const categoryMatch = appState.filters.category === 'all' || 
                             appState.filters.category === product.category ||
@@ -463,18 +465,21 @@ function renderProducts() {
     }).join('');
 }
 
-// Quantity Control Functions
+// Quantity Control Functions — called from inline onclick handlers in HTML
+// eslint-disable-next-line no-unused-vars
 function increaseQuantity(productId) {
     const input = document.getElementById(`qty-${productId}`);
     input.value = parseInt(input.value) + 1;
 }
 
+// eslint-disable-next-line no-unused-vars
 function decreaseQuantity(productId) {
     const input = document.getElementById(`qty-${productId}`);
     const newValue = Math.max(1, parseInt(input.value) - 1);
     input.value = newValue;
 }
 
+// eslint-disable-next-line no-unused-vars
 function handleAddToCart(productId) {
     const quantity = parseInt(document.getElementById(`qty-${productId}`).value);
     addToCart(productId, quantity);

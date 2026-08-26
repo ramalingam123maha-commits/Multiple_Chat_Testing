@@ -86,7 +86,7 @@ function initializeWeather() {
                 fetchWeatherByCoordinates(latitude, longitude);
             },
             error => {
-                console.log('Geolocation error:', error);
+                console.log('Geolocation error:', error); // eslint-disable-line no-console
                 fetchWeatherByCity('London');
             }
         );
@@ -142,7 +142,7 @@ async function handleSearchInput(event) {
                 suggestionsDiv.appendChild(suggestion);
             });
         } catch (error) {
-            console.error('Error fetching suggestions:', error);
+            console.error('Error fetching suggestions:', error); // eslint-disable-line no-console
             showError('Error fetching city suggestions');
         }
     }, 300);
@@ -188,10 +188,10 @@ async function fetchWeatherByCity(cityName) {
             return;
         }
 
-        const { lat, lon, name, state, country } = cities[0];
+        const { lat, lon, name } = cities[0];
         await fetchWeatherByCoordinates(lat, lon, name);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error); // eslint-disable-line no-console
         showError('Error fetching weather data. Please check the city name.');
         weatherCard.innerHTML = '';
     }
@@ -224,7 +224,7 @@ async function fetchWeatherByCoordinates(lat, lon, cityName = '') {
         displayCurrentWeather(data, cityName);
         displayForecast(data);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error); // eslint-disable-line no-console
         showError('Error fetching weather data. Please try again.');
         weatherCard.innerHTML = '';
     }
@@ -322,7 +322,6 @@ function displayForecast(data) {
         if (index === 0) return; // Skip today
 
         const day = forecastData[dayKey];
-        const avgTemp = Math.round(day.temps.reduce((a, b) => a + b) / day.temps.length);
         const minTemp = Math.round(Math.min(...day.temps));
         const maxTemp = Math.round(Math.max(...day.temps));
         const avgHumidity = Math.round(day.humidity.reduce((a, b) => a + b) / day.humidity.length);

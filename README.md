@@ -210,6 +210,63 @@ Possible features to add:
 - [ ] Unit conversion (°C / °F)
 - [ ] Share weather data feature
 
+---
+
+## CI / CD
+
+This project uses a **GitHub Actions CI pipeline** that runs on every push and on every pull request targeting `main`.
+
+### Pipeline stages (each must pass before the next starts)
+
+| # | Job | Tool | What it checks |
+|---|-----|------|----------------|
+| 1 | **Lint** | ESLint | Code style, unused variables, `==` vs `===`, `var` usage |
+| 2 | **Type Check** | TypeScript `tsc --noEmit --checkJs` | Type correctness via JSDoc annotations |
+| 3 | **Unit Tests** | Jest + jsdom | Business logic + DOM integration, with coverage threshold |
+| 4 | **Build** | esbuild | Produces minified production bundle in `dist/` |
+
+### Running CI locally
+
+```bash
+npm install
+npm run lint        # step 1
+npm run typecheck   # step 2
+npm run test        # step 3
+npm run build       # step 4
+
+# or all at once:
+npm run ci
+```
+
+### Blocking merges to `main` (branch protection)
+
+To prevent any PR from merging if CI fails, configure branch protection rules:
+
+1. Go to **Settings → Branches** in your GitHub repository.
+2. Click **Add branch protection rule**.
+3. Set **Branch name pattern** to `main`.
+4. Enable the following options:
+
+   | Option | Purpose |
+   |--------|---------|
+   | ✅ **Require a pull request before merging** | No direct pushes to `main` |
+   | ✅ **Require status checks to pass before merging** | CI must be green |
+   | ✅ **Require branches to be up to date before merging** | Prevents stale PRs |
+   | ✅ **Do not allow bypassing the above settings** | Applies to admins too |
+
+5. Under **Status checks that are required**, search for and add:
+   - `Lint`
+   - `Type Check`
+   - `Unit Tests`
+   - `Build`
+   - `CI Passed` *(the summary job — add this as a single gate if preferred)*
+
+6. Click **Save changes**.
+
+> **Note:** Status check names appear in the dropdown only after the workflow has run at least once.
+
+---
+
 ## License
 
 This project is open source and available for personal and commercial use.
