@@ -1,27 +1,13 @@
 /* ═══════════════════════════════════════════
    BIRTHDAY REMIND — APP LOGIC
+   (Using modern reactive state management)
    ═══════════════════════════════════════════ */
 
 'use strict';
 
-// ─────────────────────────────────────────────
-//  DATA LAYER
-// ─────────────────────────────────────────────
-const STORAGE_KEY = 'birthdayRemind_v1';
-
-function loadFriends() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveFriends(friends) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(friends));
-}
-
-let friends = loadFriends();
+/* ═══════════════════════════════════════════
+   STATE LAYER (Reactive Store Pattern)
+   ═══════════════════════════════════════════ */
 
 // ─────────────────────────────────────────────
 //  DATE UTILITIES
@@ -146,19 +132,21 @@ const confirmDeleteBtn = document.getElementById('confirmDelete');
 
 const toast = document.getElementById('toast');
 
-// ─────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────
-let pendingDeleteId = null;
-let currentCardFriend = null;
-let currentTheme = 'pink';
+/* ═══════════════════════════════════════════
+   MODERN PATTERN: State is managed through
+   the reactive store (state.js), not globals
+   ═══════════════════════════════════════════ */
 
 // ─────────────────────────────────────────────
 //  RENDER
 // ─────────────────────────────────────────────
 function render() {
-  const query    = searchBox.value.trim().toLowerCase();
-  const maxDays  = filterSelect.value === 'all' ? Infinity : Number(filterSelect.value);
+  const appState = store.getState();
+  const friends = appState.friends;
+  const uiState = appState.uiState;
+  
+  const query    = uiState.searchQuery.toLowerCase();
+  const maxDays  = uiState.filterWindow === 'all' ? Infinity : Number(uiState.filterWindow);
 
   // Enrich each friend with computed fields
   const enriched = friends.map(f => {
@@ -231,6 +219,9 @@ function createCard(f) {
 }
 
 function updateStats(enriched) {
+  const appState = store.getState();
+  const friends = appState.friends;
+  
   statTotal.textContent = friends.length;
 
   const nowMonth = new Date().getMonth() + 1;
@@ -268,21 +259,14 @@ addForm.addEventListener('submit', e => {
   if (!valid) return;
 
   // Check duplicate
-  if (friends.some(f => f.name.toLowerCase() === name.toLowerCase() && f.birthday === bday)) {
+  const appState = store.getState();
+  if (appState.friends.some(f => f.name.toLowerCase() === name.toLowerCase() && f.birthday === bday)) {
     showToast(`${name} is already in your list!`);
     return;
   }
 
-  const friend = {
-    id: crypto.randomUUID(),
-    name,
-    birthday: bday,
-    note,
-    addedAt: Date.now(),
-  };
-
-  friends.push(friend);
-  saveFriends(friends);
+  // Use store action (automatic persistence)
+  store.addFriend(name, bday, note);
   render();
 
   addForm.reset();
@@ -297,12 +281,12 @@ birthdayList.addEventListener('click', e => {
   const delBtn   = e.target.closest('.delete-btn');
 
   if (sendBtn) {
-    const friend = friends.find(f => f.id === sendBtn.dataset.id);
+    const friend = store.getFriend(sendBtn.dataset.id);
     if (friend) openCardModal(friend);
   }
 
   if (delBtn) {
-    const friend = friends.find(f => f.id === delBtn.dataset.id);
+    const friend = store.getFriend(delBtn.dataset.id);
     if (friend) openDeleteModal(friend);
   }
 });
@@ -310,31 +294,41 @@ birthdayList.addEventListener('click', e => {
 // ─────────────────────────────────────────────
 //  SEARCH & FILTER
 // ─────────────────────────────────────────────
-searchBox.addEventListener('input', render);
-filterSelect.addEventListener('change', render);
+searchBox.addEventListener('input', e => {
+  store.setSearchQuery(e.target.value.trim());
+  render();
+});
+
+filterSelect.addEventListener('change', e => {
+  store.setFilterWindow(e.target.value);
+  render();
+});
 
 // ─────────────────────────────────────────────
 //  DELETE MODAL
 // ─────────────────────────────────────────────
 function openDeleteModal(friend) {
-  pendingDeleteId = friend.id;
+  store.setPendingDeleteId(friend.id);
   deleteTargetName.textContent = friend.name;
   deleteModal.hidden = false;
 }
 
 cancelDeleteBtn.addEventListener('click', () => {
   deleteModal.hidden = true;
-  pendingDeleteId = null;
+  store.setPendingDeleteId(null);
 });
 
 confirmDeleteBtn.addEventListener('click', () => {
-  if (!pendingDeleteId) return;
-  const name = friends.find(f => f.id === pendingDeleteId)?.name || 'Friend';
-  friends = friends.filter(f => f.id !== pendingDeleteId);
-  saveFriends(friends);
+  const uiState = store.getUIState();
+  if (!uiState.pendingDeleteId) return;
+  
+  const friend = store.getFriend(uiState.pendingDeleteId);
+  const name = friend?.name || 'Friend';
+  
+  store.removeFriend(uiState.pendingDeleteId);
   render();
   deleteModal.hidden = true;
-  pendingDeleteId = null;
+  store.setPendingDeleteId(null);
   showToast(`Removed ${name}`);
 });
 
@@ -359,8 +353,8 @@ const DEFAULT_MESSAGES = {
 };
 
 function openCardModal(friend) {
-  currentCardFriend = friend;
-  currentTheme = 'pink';
+  store.setCurrentCardFriend(friend.id);
+  store.setCurrentTheme('pink');
 
   cardRecipientLabel.textContent = friend.name;
   cardName.textContent = friend.name + '!';
@@ -374,7 +368,7 @@ function openCardModal(friend) {
 }
 
 function applyTheme(theme) {
-  currentTheme = theme;
+  store.setCurrentTheme(theme);
   cardPreview.setAttribute('data-card-theme', theme);
 
   // update active button
@@ -396,9 +390,10 @@ themePicker.addEventListener('click', e => {
 cardCustomMsg.addEventListener('input', () => {
   const len = cardCustomMsg.value.length;
   cardMsgLen.textContent = len;
+  const uiState = store.getUIState();
   cardMessage.textContent = cardCustomMsg.value.trim()
     ? cardCustomMsg.value
-    : DEFAULT_MESSAGES[currentTheme];
+    : DEFAULT_MESSAGES[uiState.currentTheme];
 });
 
 function spawnConfetti() {
@@ -426,7 +421,11 @@ closeModalBtn.addEventListener('click',  () => { cardModal.hidden = true; });
 closeModal2Btn.addEventListener('click', () => { cardModal.hidden = true; });
 
 sendCardBtn.addEventListener('click', () => {
-  if (!currentCardFriend) return;
+  const uiState = store.getUIState();
+  if (!uiState.currentCardFriend) return;
+
+  const friend = store.getFriend(uiState.currentCardFriend);
+  if (!friend) return;
 
   // Animate button
   sendCardBtn.disabled = true;
@@ -436,7 +435,7 @@ sendCardBtn.addEventListener('click', () => {
     cardModal.hidden = true;
     sendCardBtn.disabled = false;
     sendCardBtn.innerHTML = '<span class="btn-icon">💌</span> Send Card';
-    showToast(`💌 Card sent to ${currentCardFriend.name}!`);
+    showToast(`💌 Card sent to ${friend.name}!`);
   }, 1200);
 });
 
@@ -484,7 +483,8 @@ bdayInput.max = maxDate;
 //  SEED DEMO DATA (first visit)
 // ─────────────────────────────────────────────
 function seedDemoData() {
-  if (friends.length > 0) return;
+  const appState = store.getState();
+  if (appState.friends.length > 0) return;
 
   const now   = new Date();
   const year  = now.getFullYear();
@@ -506,13 +506,10 @@ function seedDemoData() {
   const d45 = new Date(now); d45.setDate(day + 45);
   const in45 = `${year - 22}-${String(d45.getMonth() + 1).padStart(2, '0')}-${String(d45.getDate()).padStart(2, '0')}`;
 
-  friends = [
-    { id: crypto.randomUUID(), name: 'Alex Rivera',   birthday: todayStr, note: 'Loves hiking & espresso ☕',  addedAt: Date.now() },
-    { id: crypto.randomUUID(), name: 'Jamie Chen',    birthday: in5,      note: 'Big Star Wars fan 🚀',        addedAt: Date.now() },
-    { id: crypto.randomUUID(), name: 'Morgan Blake',  birthday: in20,     note: 'Baker extraordinaire 🧁',     addedAt: Date.now() },
-    { id: crypto.randomUUID(), name: 'Sam Torres',    birthday: in45,     note: '',                            addedAt: Date.now() },
-  ];
-  saveFriends(friends);
+  store.addFriend('Alex Rivera',   todayStr, 'Loves hiking & espresso ☕');
+  store.addFriend('Jamie Chen',    in5,      'Big Star Wars fan 🚀');
+  store.addFriend('Morgan Blake',  in20,     'Baker extraordinaire 🧁');
+  store.addFriend('Sam Torres',    in45,     '');
 }
 
 // ─────────────────────────────────────────────
