@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskCard Component Demo</title>
+    <link rel="stylesheet" href="task-card.css">
+</head>
+<body>
+    <div class="container">
+        <h1>TaskCard Component Examples</h1>
+        
+        <!-- Demo Section -->
+        <section class="demo-section">
+            <h2>High Priority Tasks</h2>
+            <div class="task-grid">
+                <!-- Task Card 1: High Priority -->
+                <div class="task-card" role="article" aria-label="Task: Design System Documentation - Due Dec 15 - High Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">Design System Documentation</h3>
+                        <span class="task-card__badge task-card__badge--high" aria-label="High Priority">
+                            High
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Complete comprehensive documentation for all UI components including usage guidelines and accessibility notes.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Dec 15, 2024
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Task Card 2: High Priority -->
+                <div class="task-card" role="article" aria-label="Task: API Endpoint Implementation - Due Dec 10 - High Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">API Endpoint Implementation</h3>
+                        <span class="task-card__badge task-card__badge--high" aria-label="High Priority">
+                            High
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Build RESTful endpoints for user authentication and profile management with proper error handling.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Dec 10, 2024
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Medium Priority Section -->
+        <section class="demo-section">
+            <h2>Medium Priority Tasks</h2>
+            <div class="task-grid">
+                <!-- Task Card 3: Medium Priority -->
+                <div class="task-card" role="article" aria-label="Task: Accessibility Audit - Due Dec 20 - Medium Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">Accessibility Audit</h3>
+                        <span class="task-card__badge task-card__badge--medium" aria-label="Medium Priority">
+                            Medium
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Review all components for WCAG 2.1 AA compliance and generate a comprehensive audit report.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Dec 20, 2024
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Task Card 4: Medium Priority -->
+                <div class="task-card" role="article" aria-label="Task: Performance Optimization - Due Dec 22 - Medium Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">Performance Optimization</h3>
+                        <span class="task-card__badge task-card__badge--medium" aria-label="Medium Priority">
+                            Medium
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Optimize bundle size and implement lazy loading for improved page load times and better Core Web Vitals.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Dec 22, 2024
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Low Priority Section -->
+        <section class="demo-section">
+            <h2>Low Priority Tasks</h2>
+            <div class="task-grid">
+                <!-- Task Card 5: Low Priority -->
+                <div class="task-card" role="article" aria-label="Task: Code Documentation - Due Jan 5 - Low Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">Code Documentation</h3>
+                        <span class="task-card__badge task-card__badge--low" aria-label="Low Priority">
+                            Low
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Add inline comments and JSDoc documentation to utility functions and helper modules.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Jan 5, 2025
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Task Card 6: Low Priority -->
+                <div class="task-card" role="article" aria-label="Task: Design System Refactor - Due Jan 10 - Low Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">Design System Refactor</h3>
+                        <span class="task-card__badge task-card__badge--low" aria-label="Low Priority">
+                            Low
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Consolidate duplicate styles and modernize CSS variables for better maintainability.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Jan 10, 2025
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Single Column Mobile Demo -->
+        <section class="demo-section">
+            <h2>Responsive Stack Demo</h2>
+            <div class="task-grid task-grid--single">
+                <div class="task-card" role="article" aria-label="Task: Mobile Responsiveness Testing - Due Dec 18 - High Priority">
+                    <div class="task-card__header">
+                        <h3 class="task-card__title">Mobile Responsiveness Testing</h3>
+                        <span class="task-card__badge task-card__badge--high" aria-label="High Priority">
+                            High
+                        </span>
+                    </div>
+                    <p class="task-card__description">
+                        Test all components across mobile devices and tablets. Ensure touch targets are at least 44x44px and interactions are mobile-optimized.
+                    </p>
+                    <div class="task-card__footer">
+                        <span class="task-card__due-date" aria-label="Due date">
+                            <svg class="task-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M7 10h10M7 14h7M19 3h-1V2h-2v1H8V2H6v1H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/>
+                            </svg>
+                            Dec 18, 2024
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="task-card.js"></script>
+</body>
+</html>

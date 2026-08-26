@@ -1,0 +1,480 @@
+/* =============================================
+   TASK CARD COMPONENT — STYLESHEET
+   Design System: Dark Theme with Accent Colors
+   ============================================= */
+
+:root {
+  /* Color Palette */
+  --clr-bg:          #05070f;
+  --clr-surface:     #0d1124;
+  --clr-surface-2:   #131829;
+  --clr-border:      rgba(255, 255, 255, 0.08);
+  --clr-accent:      #6c63ff;
+  --clr-accent-2:    #ff6584;
+  --clr-accent-3:    #43e8d8;
+  --clr-text:        #e8eaf6;
+  --clr-text-muted:  #8892b0;
+  --clr-white:       #ffffff;
+
+  /* Priority Colors */
+  --clr-priority-high:   #ff6584;
+  --clr-priority-med:    #ffa500;
+  --clr-priority-low:    #43e8d8;
+
+  /* Gradients */
+  --gradient-accent: linear-gradient(135deg, #6c63ff 0%, #a855f7 100%);
+  --gradient-cta:    linear-gradient(135deg, #6c63ff, #43e8d8);
+
+  /* Typography */
+  --font-main:       'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:       'Orbitron', 'Courier New', monospace;
+
+  /* Spacing */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  /* Border Radius */
+  --radius-sm:       8px;
+  --radius-md:       16px;
+  --radius-lg:       24px;
+
+  /* Shadows */
+  --shadow-card:     0 4px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow:     0 0 40px rgba(108, 99, 255, 0.3);
+  --shadow-hover:    0 8px 48px rgba(108, 99, 255, 0.2);
+
+  /* Transitions */
+  --transition:      all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s ease;
+}
+
+/* =============================================
+   BASE STYLES
+   ============================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--clr-bg);
+  color: var(--clr-text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ---- Page Layout ---- */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md);
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: var(--space-xl);
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--clr-text);
+  margin-bottom: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+/* =============================================
+   DEMO SECTION LAYOUT
+   ============================================= */
+
+.demo-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* Single column grid for mobile demo */
+.task-grid--single {
+  grid-template-columns: 1fr;
+  max-width: 500px;
+}
+
+/* =============================================
+   TASK CARD COMPONENT
+   ============================================= */
+
+.task-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+
+  /* Accessibility: Focus visible styles */
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Focus state for keyboard navigation */
+.task-card:focus-visible {
+  outline: 2px solid var(--clr-accent);
+  outline-offset: 4px;
+  box-shadow: var(--shadow-glow);
+}
+
+/* Hover state */
+.task-card:hover {
+  border-color: rgba(108, 99, 255, 0.3);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+
+/* Before pseudo-element for gradient accent */
+.task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-accent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.task-card:hover::before {
+  opacity: 1;
+}
+
+/* ---- Task Card Header ---- */
+.task-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.task-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--clr-white);
+  line-height: 1.4;
+  flex: 1;
+  word-break: break-word;
+}
+
+/* ---- Priority Badge ---- */
+.task-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: var(--transition-fast);
+}
+
+/* High Priority Badge */
+.task-card__badge--high {
+  background: rgba(255, 101, 132, 0.15);
+  color: var(--clr-priority-high);
+  border: 1px solid rgba(255, 101, 132, 0.3);
+}
+
+.task-card:hover .task-card__badge--high {
+  background: rgba(255, 101, 132, 0.25);
+  border-color: var(--clr-priority-high);
+}
+
+/* Medium Priority Badge */
+.task-card__badge--medium {
+  background: rgba(255, 165, 0, 0.15);
+  color: var(--clr-priority-med);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+}
+
+.task-card:hover .task-card__badge--medium {
+  background: rgba(255, 165, 0, 0.25);
+  border-color: var(--clr-priority-med);
+}
+
+/* Low Priority Badge */
+.task-card__badge--low {
+  background: rgba(67, 232, 216, 0.15);
+  color: var(--clr-priority-low);
+  border: 1px solid rgba(67, 232, 216, 0.3);
+}
+
+.task-card:hover .task-card__badge--low {
+  background: rgba(67, 232, 216, 0.25);
+  border-color: var(--clr-priority-low);
+}
+
+/* ---- Task Card Description ---- */
+.task-card__description {
+  font-size: 0.95rem;
+  color: var(--clr-text-muted);
+  line-height: 1.6;
+  flex: 1;
+  word-break: break-word;
+}
+
+/* ---- Task Card Footer ---- */
+.task-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--clr-border);
+}
+
+/* ---- Due Date ---- */
+.task-card__due-date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.task-card:hover .task-card__due-date {
+  color: var(--clr-accent-3);
+}
+
+/* ---- Icon ---- */
+.task-card__icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* =============================================
+   RESPONSIVE DESIGN
+   ============================================= */
+
+/* Tablet (768px and down) */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: var(--space-lg);
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+
+  .task-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+    gap: var(--space-md);
+  }
+
+  .task-card {
+    padding: var(--space-md);
+  }
+
+  .task-card__title {
+    font-size: 1.1rem;
+  }
+
+  .task-card__description {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile (480px and down) */
+@media (max-width: 480px) {
+  .container {
+    padding: var(--space-md) var(--space-sm);
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-md);
+  }
+
+  h2 {
+    font-size: 1rem;
+    margin-bottom: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  .task-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .task-card {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .task-card__header {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .task-card__title {
+    font-size: 1rem;
+  }
+
+  .task-card__badge {
+    align-self: flex-start;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.7rem;
+  }
+
+  .task-card__description {
+    font-size: 0.85rem;
+  }
+
+  .task-card__due-date {
+    font-size: 0.8rem;
+  }
+
+  .task-card__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .task-card__footer {
+    padding-top: var(--space-sm);
+  }
+
+  /* Prevent hover transform on mobile for better touch experience */
+  @media (hover: none) {
+    .task-card:hover {
+      transform: none;
+    }
+  }
+}
+
+/* =============================================
+   ACCESSIBILITY & FOCUS STYLES
+   ============================================= */
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  .task-card {
+    border: 2px solid var(--clr-border);
+  }
+
+  .task-card:focus-visible {
+    outline: 3px solid var(--clr-accent);
+    outline-offset: 3px;
+  }
+
+  .task-card__badge {
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .task-card,
+  .task-card__due-date,
+  .task-card__badge {
+    transition: none;
+  }
+
+  .task-card:hover {
+    transform: none;
+  }
+}
+
+/* Dark mode (implicit in design, but explicit for clarity) */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--clr-bg);
+    color: var(--clr-text);
+  }
+}
+
+/* =============================================
+   PRINT STYLES
+   ============================================= */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .task-card {
+    background: white;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .task-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .task-card__title {
+    color: black;
+  }
+
+  .task-card__description {
+    color: #333;
+  }
+}
+
+/* =============================================
+   UTILITY CLASSES
+   ============================================= */
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
