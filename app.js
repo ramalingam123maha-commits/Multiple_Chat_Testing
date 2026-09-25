@@ -8,6 +8,7 @@ const apiKeyInput = document.getElementById('apiKeyInput');
 const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 const suggestionsDiv = document.getElementById('suggestions');
 const weatherCard = document.getElementById('weatherCard');
 const forecastContainer = document.getElementById('forecastContainer');
@@ -74,6 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === 'Enter') handleSearch();
     });
     searchInput.addEventListener('input', handleSearchInput);
+
+    // Logout functionality
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('weatherApiKey');
+            window.location.href = 'logout.html';
+        });
+    }
 });
 
 // Initialize weather display
