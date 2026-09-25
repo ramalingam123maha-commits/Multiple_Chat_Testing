@@ -97,7 +97,23 @@ body {
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
+.logout-btn-header {
+    background: transparent;
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.logout-btn-header:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -147,7 +163,23 @@ body {
     padding: 12px 20px;
     border: none;
     border-radius: 50px;
-    font-size: 16px;
+.logout-btn-header {
+    background: transparent;
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.logout-btn-header:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
     background: rgba(255, 255, 255, 0.95);
     transition: all 0.3s ease;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -165,7 +197,23 @@ body {
     background: rgba(255, 255, 255, 0.95);
     border: none;
     border-radius: 50px;
-    font-size: 16px;
+.logout-btn-header {
+    background: transparent;
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.logout-btn-header:hover {
+    background: #ff4d4d;
+    color: white;
+}
+
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
