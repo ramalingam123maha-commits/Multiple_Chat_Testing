@@ -62,6 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Allow Enter key to save API key
+
+// Logout function
+function logout() {
+    // Perform logout operations (e.g. clear session, tokens)
+    window.location.href = 'logout.html';
+}
+
     apiKeyInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
             saveApiKeyBtn.click();
