@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager - Collaborative Project Management</title>
+  <link rel="stylesheet" href="task-styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>📋 TaskFlow</h1>
+        <span id="wsStatus" class="ws-badge offline">● Offline</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" onclick="showView('overview')" class="nav-item active" data-view="overview">
+          <span class="icon">📊</span> Overview
+        </a>
+        <a href="#" onclick="showView('projects')" class="nav-item" data-view="projects">
+          <span class="icon">📁</span> Projects
+        </a>
+        <a href="#" onclick="showView('tasks')" class="nav-item" data-view="tasks">
+          <span class="icon">✓</span> My Tasks
+        </a>
+        <a href="#" onclick="showView('calendar')" class="nav-item" data-view="calendar">
+          <span class="icon">📅</span> Calendar
+        </a>
+        <a href="#" onclick="showView('team')" class="nav-item" data-view="team">
+          <span class="icon">👥</span> Team
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-widget">
+          <div class="user-avatar">👤</div>
+          <div class="user-info">
+            <p id="currentUserName">Loading...</p>
+            <p id="currentUserRole">User</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h2 id="viewTitle">Dashboard</h2>
+        </div>
+        <div class="header-right">
+          <input type="text" id="searchBox" placeholder="Search tasks..." class="search-input">
+          <button onclick="toggleNotifications()" class="header-btn">
+            🔔 <span id="notificationBadge" style="display:none;" class="badge">0</span>
+          </button>
+          <div id="notificationsPanel" class="notifications-panel" style="display:none;">
+            <div id="notificationsList"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Views -->
+      <div class="views-container">
+        <!-- Overview View -->
+        <section id="overview" class="view active">
+          <h2>Dashboard Overview</h2>
+          <div class="overview-grid">
+            <div class="stat-card">
+              <h3 id="totalTasksCount">0</h3>
+              <p>Total Tasks</p>
+            </div>
+            <div class="stat-card">
+              <h3 id="completedTasksCount">0</h3>
+              <p>Completed Tasks</p>
+            </div>
+            <div class="stat-card">
+              <h3 id="inProgressCount">0</h3>
+              <p>In Progress</p>
+            </div>
+            <div class="stat-card">
+              <h3 id="overdueCount">0</h3>
+              <p>Overdue Tasks</p>
+            </div>
+          </div>
+
+          <div class="overview-content">
+            <div class="chart-box">
+              <h3>Project Progress</h3>
+              <div id="projectProgress"></div>
+            </div>
+            <div class="chart-box">
+              <h3>Team Performance</h3>
+              <div id="teamPerformance"></div>
+            </div>
+          </div>
+
+          <div class="recent-tasks">
+            <h3>Upcoming Tasks</h3>
+            <div id="upcomingTasks"></div>
+          </div>
+        </section>
+
+        <!-- Projects View -->
+        <section id="projects" class="view">
+          <h2>Projects</h2>
+          <div class="form-section">
+            <h3>Create New Project</h3>
+            <form id="projectForm">
+              <div class="form-row">
+                <input type="text" id="projectName" placeholder="Project name" required>
+                <textarea id="projectDesc" placeholder="Project description" rows="2"></textarea>
+              </div>
+              <div class="form-row">
+                <input type="color" id="projectColor" value="#3498db">
+                <button type="submit" class="btn-primary">Create Project</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="projects-grid" id="projectsGrid"></div>
+        </section>
+
+        <!-- Tasks View -->
+        <section id="tasks" class="view">
+          <h2>My Tasks</h2>
+          
+          <div class="filters">
+            <select id="statusFilter">
+              <option value="">All Statuses</option>
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+            <select id="priorityFilter">
+              <option value="">All Priorities</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+
+          <div class="task-form-section">
+            <h3>Create New Task</h3>
+            <form id="taskForm">
+              <div class="form-row">
+                <select id="taskProject" required>
+                  <option value="">Select Project</option>
+                </select>
+                <input type="text" id="taskTitle" placeholder="Task title" required>
+              </div>
+              <div class="form-row">
+                <textarea id="taskDesc" placeholder="Task description" rows="2"></textarea>
+              </div>
+              <div class="form-row">
+                <select id="taskPriority">
+                  <option value="medium">Medium Priority</option>
+                  <option value="high">High Priority</option>
+                  <option value="low">Low Priority</option>
+                </select>
+                <select id="taskAssignee">
+                  <option value="">Assign to...</option>
+                </select>
+                <input type="date" id="taskDue">
+                <input type="number" id="taskHours" placeholder="Est. Hours" min="0" step="0.5">
+              </div>
+              <button type="submit" class="btn-primary">Create Task</button>
+            </form>
+          </div>
+
+          <div class="tasks-list" id="tasksList"></div>
+        </section>
+
+        <!-- Calendar View -->
+        <section id="calendar" class="view">
+          <h2>Calendar</h2>
+          <div class="calendar-container">
+            <div id="taskTimeline"></div>
+          </div>
+        </section>
+
+        <!-- Team View -->
+        <section id="team" class="view">
+          <h2>Team Members</h2>
+          <div class="team-grid" id="teamGrid"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Task Detail Modal -->
+  <div id="taskModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('taskModal')">&times;</span>
+      <div id="taskDetails"></div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="task-app.js"></script>
+</body>
+</html>
