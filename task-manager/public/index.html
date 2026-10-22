@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager - Collaborative Project Management</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login Page -->
+    <div id="login-container" class="login-container">
+      <div class="login-box">
+        <h1>Task Manager</h1>
+        <p class="tagline">Collaborative Project Management</p>
+        <div class="tabs">
+          <button class="tab-button active" onclick="switchTab('login')">Login</button>
+          <button class="tab-button" onclick="switchTab('register')">Register</button>
+        </div>
+        
+        <div id="login-form" class="tab-content active">
+          <form onsubmit="loginUser(event)">
+            <input type="email" placeholder="Email" id="login-email" required>
+            <input type="password" placeholder="Password" id="login-password" required>
+            <button type="submit">Login</button>
+            <p id="login-error" class="error"></p>
+          </form>
+        </div>
+
+        <div id="register-form" class="tab-content">
+          <form onsubmit="registerUser(event)">
+            <input type="text" placeholder="Username" id="reg-username" required>
+            <input type="text" placeholder="First Name" id="reg-firstname" required>
+            <input type="text" placeholder="Last Name" id="reg-lastname" required>
+            <input type="email" placeholder="Email" id="reg-email" required>
+            <input type="password" placeholder="Password" id="reg-password" required>
+            <button type="submit">Register</button>
+            <p id="register-error" class="error"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard hidden">
+      <nav class="navbar">
+        <div class="nav-brand">
+          <h2>📋 Task Manager</h2>
+        </div>
+        <div class="nav-menu">
+          <span id="user-info"></span>
+          <button onclick="logout()">Logout</button>
+        </div>
+      </nav>
+
+      <div class="container">
+        <aside class="sidebar">
+          <ul id="menu">
+            <li><a href="#" onclick="showPage('dashboard')">Dashboard</a></li>
+            <li><a href="#" onclick="showPage('projects')">Projects</a></li>
+            <li><a href="#" onclick="showPage('tasks')">My Tasks</a></li>
+            <li><a href="#" onclick="showPage('teams')">Teams</a></li>
+            <li><a href="#" onclick="showPage('profile')">Profile</a></li>
+          </ul>
+        </aside>
+
+        <main class="content">
+          <!-- Dashboard Page -->
+          <div id="dashboard-page" class="page active">
+            <h1>Dashboard</h1>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h3>Active Projects</h3>
+                <p id="active-projects">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>Total Tasks</h3>
+                <p id="total-tasks">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>Tasks Assigned to Me</h3>
+                <p id="my-tasks">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>Overdue Tasks</h3>
+                <p id="overdue-tasks">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>In Progress</h3>
+                <p id="in-progress">0</p>
+              </div>
+              <div class="stat-card">
+                <h3>Completed This Week</h3>
+                <p id="completed-week">0</p>
+              </div>
+            </div>
+
+            <div class="dashboard-content">
+              <section class="recent-tasks">
+                <h2>Recent Tasks</h2>
+                <table id="recent-tasks-table" class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Task</th>
+                      <th>Project</th>
+                      <th>Priority</th>
+                      <th>Status</th>
+                      <th>Due Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-tasks-tbody"></tbody>
+                </table>
+              </section>
+            </div>
+          </div>
+
+          <!-- Projects Page -->
+          <div id="projects-page" class="page">
+            <div class="page-header">
+              <h1>Projects</h1>
+              <button id="create-project-btn" onclick="openCreateProjectModal()">+ New Project</button>
+            </div>
+
+            <div class="projects-grid" id="projects-grid">
+            </div>
+          </div>
+
+          <!-- Tasks Page -->
+          <div id="tasks-page" class="page">
+            <div class="page-header">
+              <h1>My Tasks</h1>
+              <button id="create-task-btn" onclick="openCreateTaskModal()">+ New Task</button>
+            </div>
+
+            <div class="filters">
+              <select id="task-status-filter" onchange="filterTasks()">
+                <option value="">All Status</option>
+                <option value="Todo">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="In Review">In Review</option>
+                <option value="Done">Done</option>
+              </select>
+              <select id="task-priority-filter" onchange="filterTasks()">
+                <option value="">All Priorities</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+
+            <div class="kanban-board" id="kanban-board">
+              <div class="kanban-column" data-status="Todo">
+                <h3>To Do</h3>
+                <div class="task-list" id="list-Todo"></div>
+              </div>
+              <div class="kanban-column" data-status="In Progress">
+                <h3>In Progress</h3>
+                <div class="task-list" id="list-In Progress"></div>
+              </div>
+              <div class="kanban-column" data-status="In Review">
+                <h3>In Review</h3>
+                <div class="task-list" id="list-In Review"></div>
+              </div>
+              <div class="kanban-column" data-status="Done">
+                <h3>Done</h3>
+                <div class="task-list" id="list-Done"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teams Page -->
+          <div id="teams-page" class="page">
+            <div class="page-header">
+              <h1>Teams</h1>
+              <button id="create-team-btn" onclick="openCreateTeamModal()">+ New Team</button>
+            </div>
+
+            <table id="teams-table" class="data-table">
+              <thead>
+                <tr>
+                  <th>Team Name</th>
+                  <th>Members</th>
+                  <th>Projects</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="teams-tbody">
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Profile Page -->
+          <div id="profile-page" class="page">
+            <h1>Profile</h1>
+            <div id="profile-content" class="profile-card">
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="create-project-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('create-project-modal')">&times;</span>
+      <h2>Create New Project</h2>
+      <form onsubmit="createProject(event)">
+        <input type="text" placeholder="Project Name" required>
+        <textarea placeholder="Description"></textarea>
+        <select required>
+          <option value="">Select Category</option>
+          <option value="Development">Development</option>
+          <option value="Design">Design</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Other">Other</option>
+        </select>
+        <select>
+          <option value="Private">Private</option>
+          <option value="Team">Team</option>
+          <option value="Public">Public</option>
+        </select>
+        <button type="submit">Create Project</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="create-task-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('create-task-modal')">&times;</span>
+      <h2>Create New Task</h2>
+      <form onsubmit="createTask(event)">
+        <input type="text" placeholder="Task Title" required>
+        <textarea placeholder="Description"></textarea>
+        <select id="task-project" required>
+          <option value="">Select Project</option>
+        </select>
+        <select required>
+          <option value="">Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+        </select>
+        <input type="date" placeholder="Due Date">
+        <input type="number" placeholder="Estimated Hours" step="0.5">
+        <button type="submit">Create Task</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="create-team-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('create-team-modal')">&times;</span>
+      <h2>Create New Team</h2>
+      <form onsubmit="createTeam(event)">
+        <input type="text" placeholder="Team Name" required>
+        <textarea placeholder="Description"></textarea>
+        <button type="submit">Create Team</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
