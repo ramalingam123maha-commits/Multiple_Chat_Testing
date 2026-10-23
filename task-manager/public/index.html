@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task Manager</title>
+<style>body{font-family:system-ui,sans-serif;margin:0;background:#f3f4f6}header{background:#065f46;color:#fff;padding:1rem 2rem}main{padding:1rem 2rem}form{background:#fff;padding:1rem;border-radius:8px}input,select,button{padding:.4rem;margin:.2rem}button{background:#065f46;color:#fff;border:0;border-radius:4px}.t{background:#fff;margin:.6rem 0;padding:.8rem;border-radius:8px;border-left:6px solid #9ca3af}.urgent{border-color:#dc2626}.high{border-color:#f59e0b}.medium{border-color:#3b82f6}.done h3{text-decoration:line-through}.od{color:#dc2626;font-weight:bold}</style></head><body>
+<header><h1>Task Manager</h1></header><main>
+<form id="f"><input name="user" placeholder="Your name" required aria-label="Your name"> <input name="title" placeholder="Task title" required aria-label="Title"> <select name="priority" aria-label="Priority"><option>low</option><option selected>medium</option><option>high</option><option>urgent</option></select> <input name="deadline" type="date" aria-label="Deadline"> <button>Create</button></form>
+<p id="msg" role="alert"></p><div id="list"></div></main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const me=()=>$('[name=user]').value||'anonymous';
+async function api(m,u,b){const r=await fetch(u,{method:m,body:b&&JSON.stringify(b)});if(!r.ok){$('#msg').textContent=(await r.json()).error;return false}$('#msg').textContent='';return true}
+new EventSource('/api/events').onmessage=e=>{$('#list').innerHTML=JSON.parse(e.data).map(t=>`<div class="t ${esc(t.priority)} ${t.status==='done'?'done':''}"><h3>${esc(t.title)}</h3>
+<div>${esc(t.priority)} · ${esc(t.status)} · by ${esc(t.createdBy)} ${t.deadline?`· due ${esc(t.deadline)}`:''} ${t.overdue?'<span class="od">OVERDUE</span>':''}</div>
+<div>Assigned: ${t.assignees.map(esc).join(', ')||'nobody'}</div>
+<select data-s="${t.id}" aria-label="Status">${['todo','in-progress','done'].map(s=>`<option ${s===t.status?'selected':''}>${s}</option>`).join('')}</select>
+<button data-a="${t.id}">Assign me</button> <button data-d="${t.id}">Delete</button>
+<ul>${t.comments.map(c=>`<li><b>${esc(c.user)}</b>: ${esc(c.text)}</li>`).join('')}</ul>
+<input data-c="${t.id}" placeholder="Comment, press Enter" aria-label="Comment"></div>`).join('')};
+$('#f').onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));if(!d.deadline)delete d.deadline;await api('POST','/api/tasks',d)};
+$('#list').onchange=e=>e.target.dataset.s&&api('PATCH','/api/tasks/'+e.target.dataset.s,{status:e.target.value});
+$('#list').onclick=e=>{const d=e.target.dataset;if(d.a)api('POST',`/api/tasks/${d.a}/assign`,{user:me()});if(d.d)api('DELETE','/api/tasks/'+d.d)};
+$('#list').onkeydown=e=>{if(e.key==='Enter'&&e.target.dataset.c&&e.target.value){api('POST',`/api/tasks/${e.target.dataset.c}/comments`,{user:me(),text:e.target.value})}};
+</script></body></html>
